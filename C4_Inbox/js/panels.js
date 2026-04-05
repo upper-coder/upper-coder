@@ -1,7 +1,7 @@
 /**
  * PANELS SYSTEM
  * Manages tab switching between Email, Work, and Game
- * STATUS: OUTLINE
+ * STATUS: IMPLEMENTED
  */
 
 class PanelManager {
@@ -49,7 +49,7 @@ class PanelManager {
                 </div>
             </div>
             <div id="work-task-area" class="work-task-area">
-                <p class="placeholder">Tasks will appear here once you begin.</p>
+                <p class="placeholder">Click a task button or wait for tasks to be assigned.</p>
             </div>
         `;
         
@@ -59,10 +59,7 @@ class PanelManager {
         this.panels.work = workPanel;
     }
 
-    /**
-     * Create game panel
-     */
-    createGamePanel() {
+createGamePanel() {
         const gamePanel = document.createElement('div');
         gamePanel.id = 'game-content';
         gamePanel.className = 'content-panel hidden';
@@ -71,8 +68,13 @@ class PanelManager {
                 <h2>Break Room</h2>
             </div>
             <div id="game-area" class="game-area">
-                <p class="placeholder">Game will load here.</p>
-                <!-- TODO: Add Snake game canvas or iframe -->
+                <div class="game-container">
+                    <button id="close-game-btn" class="close-game-btn">✕ Close Game</button>
+                    <h3>Snake Game</h3>
+                    <p>Use arrow keys to move. Press any arrow key to start.</p>
+                    <canvas id="snake-canvas" width="400" height="400"></canvas>
+                    <div class="game-score">Score: <span id="game-score">0</span></div>
+                </div>
             </div>
         `;
         
@@ -80,8 +82,17 @@ class PanelManager {
         mainContent.appendChild(gamePanel);
         
         this.panels.game = gamePanel;
+        
+        // Add close button handler
+        setTimeout(() => {
+            const closeGameBtn = document.getElementById('close-game-btn');
+            if (closeGameBtn) {
+                closeGameBtn.addEventListener('click', () => {
+                    this.switchPanel('email');
+                });
+            }
+        }, 100);
     }
-
     /**
      * Set up navigation button listeners
      */
@@ -89,7 +100,7 @@ class PanelManager {
         const workBtn = document.getElementById('work-btn');
         const gameBtn = document.getElementById('game-btn');
         
-        // Initially disable buttons (will be enabled during tutorial)
+        // Initially disable buttons (will be enabled during tutorial or free play)
         workBtn.disabled = true;
         gameBtn.disabled = true;
         
@@ -105,9 +116,6 @@ class PanelManager {
                 this.switchPanel('game');
             }
         });
-        
-        // TODO: Add "Back to Email" functionality if needed
-        // Could be a button in work/game panels or always-visible email button
     }
 
     /**
@@ -156,6 +164,10 @@ class PanelManager {
                 break;
             case 'email':
                 // Email panel is always initialized
+                // Make sure email viewer is closed and list is showing
+                if (this.experiment.emailSystem) {
+                    this.experiment.emailSystem.closeEmailViewer();
+                }
                 break;
         }
     }
@@ -166,8 +178,8 @@ class PanelManager {
     initializeWorkPanel() {
         const taskArea = document.getElementById('work-task-area');
         
-        // Show task interface if not already shown
-        if (taskArea.querySelector('.placeholder')) {
+        // Show task interface if task system exists and not already shown
+        if (this.experiment.taskSystem && taskArea.querySelector('.placeholder')) {
             this.experiment.taskSystem.showTaskInterface(taskArea, false, false);
         }
     }
@@ -178,52 +190,189 @@ class PanelManager {
     initializeGamePanel() {
         const gameArea = document.getElementById('game-area');
         
-        // Load game if not already loaded
-        if (gameArea.querySelector('.placeholder')) {
-            this.loadGame(gameArea);
+        // Initialize game if not already initialized
+        if (!this.gameInitialized) {
+            this.loadGame();
+            this.gameInitialized = true;
         }
     }
 
-    /**
-     * Load Snake game
+/**
+     * Load Snake game (simple implementation)
      */
-    loadGame(container) {
-        // TODO: Implement Snake game
-        // Options:
-        // 1. Build custom Snake with Canvas
-        // 2. Embed existing Snake game via iframe
-        // 3. Use a simple JavaScript library
+    loadGame() {
+        const canvas = document.getElementById('snake-canvas');
+        if (!canvas) {
+            console.error('Canvas not found');
+            return;
+        }
         
-        container.innerHTML = `
-            <div class="game-container">
-                <h3>Snake Game</h3>
-                <p>Use arrow keys to move</p>
-                <canvas id="snake-canvas" width="400" height="400"></canvas>
-                <div class="game-score">Score: <span id="game-score">0</span></div>
-            </div>
-        `;
+        const ctx = canvas.getContext('2d');
         
-        // TODO: Initialize Snake game
-        // this.initializeSnakeGame();
+        // Simple Snake game variables
+        let snake = [{x: 200, y: 200}];
+        let direction = {x: 0, y: 0};
+        let food = {x: 0, y: 0};
+        let score = 0;
+        let gameRunning = false;
+        let gameInterval = null;
         
-        console.log('Game loaded');
-    }
-
-    /**
-     * Initialize Snake game (placeholder)
-     */
-    initializeSnakeGame() {
-        // TODO: Implement Snake game logic
-        // This is a complex component that needs its own implementation
-        // For now, this is just a placeholder
+        const gridSize = 20;
+        const tileCount = canvas.width / gridSize;
         
-        console.log('Snake game would be initialized here');
+        // Place food randomly
+        const placeFood = () => {
+            food = {
+                x: Math.floor(Math.random() * tileCount) * gridSize,
+                y: Math.floor(Math.random() * tileCount) * gridSize
+            };
+        };
         
-        // Could use a library like:
-        // - Custom Canvas implementation
-        // - Phaser.js
-        // - p5.js
-        // Or embed from external source
+        // Draw game
+        const draw = () => {
+            // Clear canvas
+            ctx.fillStyle = '#ecf0f1';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw snake
+            ctx.fillStyle = '#27ae60';
+            snake.forEach(segment => {
+                ctx.fillRect(segment.x, segment.y, gridSize - 2, gridSize - 2);
+            });
+            
+            // Draw food
+            ctx.fillStyle = '#e74c3c';
+            ctx.fillRect(food.x, food.y, gridSize - 2, gridSize - 2);
+        };
+        
+        // Update game state
+        const update = () => {
+            if (!gameRunning) return;
+            
+            // Move snake
+            const head = {
+                x: snake[0].x + direction.x,
+                y: snake[0].y + direction.y
+            };
+            
+            // Check wall collision
+            if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
+                gameOver();
+                return;
+            }
+            
+            // Check self collision
+            if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+                gameOver();
+                return;
+            }
+            
+            snake.unshift(head);
+            
+            // Check food collision
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                document.getElementById('game-score').textContent = score;
+                placeFood();
+                
+                // Track game interaction
+                if (this.experiment.tracker && this.experiment.tracker.isTracking) {
+                    this.experiment.tracker.logEvent('game_score', { score: score });
+                }
+            } else {
+                snake.pop();
+            }
+            
+            draw();
+        };
+        
+        // Game over
+        const gameOver = () => {
+            gameRunning = false;
+            if (gameInterval) {
+                clearInterval(gameInterval);
+                gameInterval = null;
+            }
+            
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'white';
+            ctx.font = '30px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Game Over!', canvas.width / 2, canvas.height / 2 - 20);
+            ctx.font = '20px Arial';
+            ctx.fillText('Score: ' + score, canvas.width / 2, canvas.height / 2 + 20);
+            ctx.fillText('Press arrow key to restart', canvas.width / 2, canvas.height / 2 + 50);
+        };
+        
+        // Reset game state
+        const resetGame = () => {
+            snake = [{x: 200, y: 200}];
+            direction = {x: 0, y: 0};
+            score = 0;
+            document.getElementById('game-score').textContent = score;
+            gameRunning = false;
+            if (gameInterval) {
+                clearInterval(gameInterval);
+                gameInterval = null;
+            }
+            
+            placeFood();
+            draw();
+        };
+        
+        // Start game
+        const startGame = () => {
+            if (gameInterval) {
+                clearInterval(gameInterval);
+            }
+            gameRunning = true;
+            gameInterval = setInterval(update, 100);
+        };
+        
+        // Keyboard controls
+        const keyHandler = (e) => {
+            // Only respond when game panel is active
+            if (this.currentPanel !== 'game') return;
+            
+            // Only respond to arrow keys
+            if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                return;
+            }
+            
+            e.preventDefault();
+            
+            // If game not running, reset and start
+            if (!gameRunning) {
+                resetGame();
+                startGame();
+            }
+            
+            // Change direction
+            switch(e.key) {
+                case 'ArrowUp':
+                    if (direction.y === 0) direction = {x: 0, y: -gridSize};
+                    break;
+                case 'ArrowDown':
+                    if (direction.y === 0) direction = {x: 0, y: gridSize};
+                    break;
+                case 'ArrowLeft':
+                    if (direction.x === 0) direction = {x: -gridSize, y: 0};
+                    break;
+                case 'ArrowRight':
+                    if (direction.x === 0) direction = {x: gridSize, y: 0};
+                    break;
+            }
+        };
+        
+        // Add event listener
+        document.addEventListener('keydown', keyHandler);
+        
+        // Initialize
+        resetGame();
+        
+        console.log('Snake game loaded');
     }
 
     /**
@@ -264,6 +413,8 @@ class PanelManager {
      * Update work task counter
      */
     updateWorkStats() {
+        if (!this.experiment.taskSystem) return;
+        
         const stats = this.experiment.taskSystem.getPerformanceStats();
         const counterElement = document.getElementById('work-completed-count');
         

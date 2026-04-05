@@ -111,7 +111,15 @@ class Clock {
     /**
      * Get current simulated time in minutes since start
      */
-    getSimulatedMinutesElapsed() {
+getSimulatedMinutesElapsed() {
+        // If paused, return the elapsed time at the moment of pause
+        if (this.isPaused && this.pauseStartTime) {
+            const realElapsedMs = this.pauseStartTime - this.realStartTime - this.totalPausedTime;
+            const realElapsedMinutes = realElapsedMs / 1000 / 60;
+            const speedMultiplier = CONFIG.DEBUG ? CONFIG.DEBUG_SPEED_MULTIPLIER : 1;
+            return Math.floor(realElapsedMinutes * CONFIG.TIME_RATIO * speedMultiplier);
+        }
+        
         const realElapsedMs = this.getRealElapsedMs();
         const realElapsedMinutes = realElapsedMs / 1000 / 60;
         

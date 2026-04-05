@@ -374,7 +374,7 @@ body {
     width: 100%;
     height: 100%;
     z-index: 8888;
-    pointer-events: none;
+    pointer-events: none; /* Changed - allows clicks through to highlighted elements */
 }
 
 .tutorial-overlay {
@@ -383,62 +383,142 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    pointer-events: auto;
+    background-color: rgba(0, 0, 0, 0.85);
+    pointer-events: none; /* Changed from auto to none - allows clicks through */
 }
 
 .tutorial-highlighted {
     position: relative;
     z-index: 8889;
-    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.8);
-    pointer-events: auto;
+    box-shadow: 0 0 0 4px #3498db, 0 0 0 9999px rgba(0, 0, 0, 0.85);
+    pointer-events: auto; /* Ensure highlighted elements are clickable */
 }
 
 .tutorial-message-container {
     position: fixed;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 8890;
+    z-index: 9999;
     pointer-events: auto;
+    max-width: 90vw;
+}
+
+/* Default position: top-right */
+.tutorial-message-container {
+    top: 20px;
+    right: 20px;
+}
+
+/* Alternative positions based on what's highlighted */
+.tutorial-message-container.bottom-right {
+    top: auto;
+    bottom: 20px;
+    right: 20px;
+    left: auto;
+}
+
+.tutorial-message-container.bottom-left {
+    top: auto;
+    bottom: 20px;
+    left: 20px;
+    right: auto;
+}
+
+.tutorial-message-container.top-left {
+    top: 20px;
+    left: 20px;
+    right: auto;
+}
+
+.tutorial-message-container.center-bottom {
+    top: auto;
+    bottom: 20px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
 }
 
 .tutorial-message {
-    background-color: white;
-    border-radius: 8px;
-    padding: 25px 30px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    max-width: 600px;
-    min-width: 400px;
+    background-color: #ffffff;
+    border: 3px solid #3498db;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    width: 380px;
+    max-width: 90vw;
+    position: relative;
+    z-index: 10000; /* Added to ensure it's on top */
 }
 
 #tutorial-text {
     font-size: 16px;
-    line-height: 1.6;
+    line-height: 1.5;
     color: #2c3e50;
     margin-bottom: 20px;
+    font-weight: 500;
 }
 
 .tutorial-btn {
     background-color: #3498db;
     color: white;
     border: none;
-    padding: 12px 30px;
-    border-radius: 6px;
-    font-size: 15px;
-    font-weight: 600;
+    padding: 14px 35px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
     width: 100%;
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
 }
 
 .tutorial-btn:hover {
     background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(52, 152, 219, 0.5);
+}
+
+.tutorial-btn:active {
+    transform: translateY(0);
 }
 
 .tutorial-btn:disabled {
     background-color: #95a5a6;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Animated arrow pointing to highlighted element */
+.tutorial-message::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+
+/* Arrow pointing down (when message is at top) */
+.top-position .tutorial-message::before {
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 15px 15px 0 15px;
+    border-color: #3498db transparent transparent transparent;
+}
+
+/* Arrow pointing up (when message is at bottom) */
+.tutorial-message::before {
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 0 15px 15px 15px;
+    border-color: transparent transparent #3498db transparent;
+}
+
+.top-position .tutorial-message::before {
+    top: auto;
+    bottom: -15px;
+    border-width: 15px 15px 0 15px;
+    border-color: #3498db transparent transparent transparent;
 }
 
 /* ============================================
@@ -898,4 +978,43 @@ body {
 
 .email-action-btn:hover {
     background-color: #2980b9;
+}
+
+/* Tutorial pulsing effect for unread emails */
+.tutorial-pulse {
+    animation: pulse-border 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(52, 152, 219, 0);
+    }
+}
+
+/* Close game button */
+.close-game-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    z-index: 1000;
+}
+
+.close-game-btn:hover {
+    background-color: #c0392b;
+}
+
+.game-container {
+    position: relative;
 }

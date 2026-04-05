@@ -1,30 +1,18 @@
-### Components Status
-
 #### COMPLETED ✅
 - Base UI (index.html, style.css)
-- Clock system (js/clock.js) - Fully functional
-- Email system (js/emails.js) - Fully functional
-  - Email loading from JSON
-  - List view / reading view
-  - Reply functionality
-  - Tracking (open time, read order, responses)
-  - Inbox navigation
+- Clock system (js/clock.js)
+- Email system (js/emails.js)
+- Panels system (js/panels.js)
+- Overlay system (js/overlay.js)
+- **Tutorial system (js/tutorial.js)**
 
 #### IN PROGRESS 🔄
-- None currently
+- Task system (js/tasks.js) - Outline exists, needs implementation
 
 #### TODO 📋
-- Navigation/Panels system (js/panels.js)
-- Overlay system (js/overlay.js)
-- Tutorial system (js/tutorial.js)
-- Task system (js/tasks.js)
 - Tracking system (js/tracking.js)
 - DataPipe integration (js/datapipe.js)
-- Main experiment controller integration (js/experiment.js)
-- Intro pages
-- Real content (emails, manipulation, tasks)
-
----
+- Main experiment controller full integration (js/experiment.js)
 
 ## Session Notes
 
@@ -73,3 +61,43 @@
 **Notes:**
 - Test code is currently in experiment.js (lines at bottom)
 - Remember to remove test code when integrating full experiment
+
+### Session 5 (2025-01-30 continued)
+**Completed:**
+- ✅ **Fully implemented Tutorial system**
+  - Dynamic email count (works with any number of initial emails)
+  - Step-by-step email reading with spotlight
+  - Multiple element highlighting (email viewer + inbox button)
+  - Wellness email delivery and highlighting
+  - Clock pause/resume control during tutorial
+  - Game time with 30s play period or early close
+  - Clock jump to 9:00 AM after game
+  - Boss video placeholder
+  - Close game button
+- ✅ **Tutorial UX improvements**
+  - Tutorial message always visible (higher z-index)
+  - Smart positioning (top-right, bottom-right, etc.)
+  - Highlighted elements clickable
+  - Pulsing effect for unread emails
+  - Squarish message box (380px)
+- ✅ Clock system enhancements (proper pause during tutorial)
+- ✅ Game panel improvements (close button, better instructions)
+
+**Tested and Working:**
+- Complete tutorial flow from welcome through boss arrival
+- Email reading cycle works for 3+ emails
+- Wellness exercise integration
+- Clock stays frozen during tutorial
+- Game playable with 30s timer or manual close
+- All spotlighting works correctly
+
+**Known Limitations:**
+- Task system not yet implemented (tutorial stops at practice task)
+- Boss video is placeholder (alert dialog)
+- No actual task content
+
+**Next Session Goals:**
+- Implement tasks.js (work task system)
+- Complete tutorial integration with practice task
+- Implement tracking.js (full behavior tracking)
+- Test complete tutorial end-to-end

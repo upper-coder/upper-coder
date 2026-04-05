@@ -2,26 +2,20 @@
 
 ## Last Session Summary
 - **Date:** 2025-01-30
-- **Completed:** Clock system + Email system
-- **Status:** Both tested and working
+- **Completed:** Clock + Email + Panels + Overlay + Tutorial systems
+- **Status:** 5 major systems complete (~75% done!)
 - **Test code location:** Bottom of js/experiment.js (temporary)
 
-## To Resume Development
-
-### Quick Checklist
-1. ✅ Read `DEV_GUIDE.md` for full context
-2. ✅ Check "Session Notes" at bottom of DEV_GUIDE.md
-3. ✅ Review "Components Status" to see what's done
-4. ✅ Decide what to work on next
-
-### Next Priority: Phase 3 - Navigation (Panels)
-**Goal:** Make Work and Game buttons functional
+## Next Priority: Phase 6 - Task System
+**Goal:** Implement work tasks so tutorial can complete
 
 **Files to modify:**
-- `js/panels.js` - Implement tab switching
-- Test the switching between Email/Work/Game views
+- `js/tasks.js` - Implement task generation and scoring
+- Update tutorial to integrate with task system
 
-**Estimated time:** 20-30 minutes
+**Then:**
+- `js/tracking.js` - Implement full behavior tracking
+- Final integration and testing
 
 ### To Start a New AI Session
 

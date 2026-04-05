@@ -155,28 +155,50 @@ document.addEventListener('DOMContentLoaded', () => {
     window.experiment.init();
 });
 
-// TEMPORARY TEST CODE - Testing email system
+// TEMPORARY TEST CODE - Testing tutorial system
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('Testing clock and email systems...');
+    console.log('Testing full tutorial flow...');
     
     // Create test experiment object
     window.experiment = {
         state: { condition: 'test_condition' },
+        data: {},
         tracker: null,
-        overlay: null
+        taskSystem: null,
+        startFreePlay: function() {
+            console.log('FREE PLAY STARTED!');
+            alert('Tutorial complete! Free play would begin now.');
+        }
     };
     
     // Start clock
     const testClock = new Clock();
     testClock.start();
+        testClock.pause(); // <-- ADD THIS LINE
     window.experiment.clock = testClock;
+    
+    // Create overlay system
+    const overlay = new Overlay(window.experiment);
+    window.experiment.overlay = overlay;
     
     // Create and test email system
     const emailSystem = new EmailSystem(window.experiment);
     await emailSystem.loadEmails('test_condition');
     emailSystem.deliverInitialEmails();
-    
     window.experiment.emailSystem = emailSystem;
     
-    console.log('Email system loaded! Try clicking on emails.');
+    // Create panel system
+    const panelManager = new PanelManager(window.experiment);
+    window.experiment.panelManager = panelManager;
+    
+    // Create tutorial system
+    const tutorial = new Tutorial(window.experiment);
+    window.experiment.tutorial = tutorial;
+    
+    // Start tutorial after brief delay
+    setTimeout(() => {
+        tutorial.start();
+    }, 1000);
+    
+    console.log('Tutorial will start in 1 second...');
 });

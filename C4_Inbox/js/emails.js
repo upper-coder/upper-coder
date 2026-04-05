@@ -19,13 +19,18 @@ class EmailSystem {
         this.setupInboxFolderClick();
     }
 
-    /**
+        /**
      * Set up inbox folder click handler
      */
     setupInboxFolderClick() {
         const inboxFolder = document.querySelector('.folder-item.active');
         if (inboxFolder) {
             inboxFolder.addEventListener('click', () => {
+                // Switch to email panel if not already there
+                if (this.experiment.panelManager) {
+                    this.experiment.panelManager.switchPanel('email');
+                }
+                // Then close email viewer if one is open
                 this.closeEmailViewer();
             });
         }
