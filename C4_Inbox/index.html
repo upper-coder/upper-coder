@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work Simulation Experiment</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="main-container">
+        <!-- Header with clock -->
+        <div id="header">
+            <div id="app-title">WorkMail</div>
+            <div id="clock-container">9:00 AM</div>
+        </div>
+
+        <!-- Email Interface -->
+        <div id="email-interface">
+            <!-- Sidebar with folder navigation -->
+            <div id="sidebar">
+                <button class="compose-btn">+ Compose</button>
+                
+                <div class="folder-list">
+                    <div class="folder-item active">
+                        <span class="folder-icon">📥</span>
+                        <span class="folder-name">Inbox</span>
+                        <span class="folder-count">0</span>
+                    </div>
+                    <div class="folder-item">
+                        <span class="folder-icon">📤</span>
+                        <span class="folder-name">Sent</span>
+                    </div>
+                    <div class="folder-item">
+                        <span class="folder-icon">📝</span>
+                        <span class="folder-name">Drafts</span>
+                    </div>
+                    <div class="folder-item">
+                        <span class="folder-icon">🗑️</span>
+                        <span class="folder-name">Trash</span>
+                    </div>
+                    <div class="folder-item">
+                        <span class="folder-icon">⚠️</span>
+                        <span class="folder-name">Junk</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main email content area -->
+            <div id="main-content">
+                <!-- Email panel (inbox) -->
+                <div id="inbox-content" class="content-panel">
+                    <div class="content-header">
+                        <h2>Inbox</h2>
+                        <div class="email-actions">
+                            <button class="action-btn">↻ Refresh</button>
+                            <button class="action-btn">🗑️ Delete</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Email list - will be populated by JavaScript -->
+                    <div id="email-list">
+                        <!-- Placeholder emails will be removed by JavaScript -->
+                        <!-- But keeping them for now so you can see the layout -->
+                    </div>
+                </div>
+
+                <!-- Work panel - created by panels.js -->
+                <!-- Game panel - created by panels.js -->
+            </div>
+        </div>
+
+        <!-- Bottom navigation buttons -->
+        <div id="bottom-nav">
+            <button id="work-btn" class="nav-button">📋 Work</button>
+            <button id="game-btn" class="nav-button">🎮 Game</button>
+        </div>
+    </div>
+
+    <!-- Overlay (for wellness, video, game, work tasks) -->
+    <!-- Created by overlay.js -->
+
+    <!-- Tutorial spotlight -->
+    <!-- Created by tutorial.js -->
+
+    <!-- Load all JavaScript files in correct order -->
+    <!-- Config must be first -->
+    <script src="js/config.js"></script>
+    
+    <!-- Core systems (order doesn't matter much here) -->
+    <script src="js/clock.js"></script>
+    <script src="js/emails.js"></script>
+    <script src="js/overlay.js"></script>
+    <script src="js/tutorial.js"></script>
+    <script src="js/tasks.js"></script>
+    <script src="js/panels.js"></script>
+    <script src="js/tracking.js"></script>
+    <script src="js/datapipe.js"></script>
+    
+    <!-- Main experiment controller must be last -->
+    <script src="js/experiment.js"></script>
+</body>
+</html>

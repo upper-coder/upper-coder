@@ -1,0 +1,80 @@
+{
+  "conditions": {
+    "test_condition": {
+      "initial_emails": ["email_001", "email_002", "email_003"],
+      "critical_emails": {
+        "prosocial": "prosocial_email",
+        "competition": "competition_email"
+      }
+    }
+  },
+  
+  "emails": {
+    "email_001": {
+      "id": "email_001",
+      "from": "HR Department",
+      "subject": "Welcome to Acme Corp!",
+      "body": "Welcome to your first day at Acme Corp! We're thrilled to have you join our team. Your manager, Sarah Chen, will be reaching out shortly with your initial assignments. If you have any questions about benefits, policies, or office logistics, please don't hesitate to reach out to us.",
+      "canReply": true,
+      "requiresReply": false
+    },
+    
+    "email_002": {
+      "id": "email_002",
+      "from": "Sarah Chen (Manager)",
+      "subject": "Team Introduction & First Assignment",
+      "body": "Good morning! I wanted to personally welcome you to the team. I'm excited to work with you. I've assigned your first task - please check the Work tab when you get a chance. Also, we have a team meeting every Friday at 2 PM. Looking forward to seeing what you accomplish!",
+      "canReply": true,
+      "requiresReply": false
+    },
+    
+    "email_003": {
+      "id": "email_003",
+      "from": "IT Department",
+      "subject": "System Access Confirmation",
+      "body": "Your system access has been set up successfully. You now have access to: Email, File Server, Project Management System, and Employee Portal. If you experience any technical issues, please submit a ticket through the IT Help Desk.",
+      "canReply": true,
+      "requiresReply": false
+    },
+    
+    "wellness_email": {
+      "id": "wellness_email",
+      "from": "Employee Wellness Program",
+      "subject": "Morning Wellness Exercise",
+      "body": "Good morning! As part of our employee wellness initiative, we invite you to complete a brief reflection exercise. This will only take a few minutes. Please click the button below to begin.",
+      "canReply": false,
+      "requiresReply": false,
+      "hasButton": true,
+      "buttonText": "Start Exercise",
+      "buttonAction": "open_wellness"
+    },
+    
+    "prosocial_email": {
+      "id": "prosocial_email",
+      "from": "Alex Martinez (Colleague)",
+      "subject": "Could you help me out?",
+      "body": "Hey! Hope you're settling in well. I'm swamped with a project deadline and could really use some help. Would you be able to complete a few tasks for me? No pressure at all - I know you have your own work to do. But if you have some spare time, I'd really appreciate it. There's a link below if you're able to help.",
+      "canReply": true,
+      "requiresReply": false,
+      "hasButton": true,
+      "buttonText": "Help with Tasks",
+      "buttonAction": "open_help_tasks",
+      "isCritical": true,
+      "type": "prosocial"
+    },
+    
+    "competition_email": {
+      "id": "competition_email",
+      "from": "Sarah Chen (Manager)",
+      "subject": "Leadership Opportunity - Are you available?",
+      "body": "I have an exciting leadership opportunity for an upcoming high-visibility project. I'd love to offer it to you, but I need to make sure you have bandwidth. Could you check the bug tracking system and let me know how many open bugs you currently have assigned? If you have more than 8, I'll need to assign this to someone else. Please reply with your current bug count.",
+      "canReply": true,
+      "requiresReply": true,
+      "hasButton": true,
+      "buttonText": "Check Bug System",
+      "buttonAction": "open_jira",
+      "isCritical": true,
+      "type": "competition"
+    }
+  }
+}
