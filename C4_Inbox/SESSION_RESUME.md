@@ -21,10 +21,13 @@
 
 Copy-paste this to the AI:I'm continuing work on my work simulation experiment.
 
-Please read DEV_GUIDE.md for full project context, then check SESSION_RESUME.md
-for where I left off.
+I'm continuing my work simulation experiment. 
 
-I'm ready to work on: [Phase 3 - Panels system / or whatever you choose]
+Please read DEV_GUIDE.md and SESSION_RESUME.md to see where I left off.
+
+#Today I want to implement the task system so the tutorial can complete.
+
+#I'm ready to work on: [Phase 3 - Panels system / or whatever you choose]
 
 ## Current Test Setup
 - Clock auto-starts on page load

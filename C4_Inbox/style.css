@@ -326,7 +326,7 @@ body {
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    max-width: 800px;
+    max-width: 900px;  /* Increase if needed */
     max-height: 90vh;
     overflow-y: auto;
     padding: 30px;
@@ -353,8 +353,22 @@ body {
     color: #e74c3c;
 }
 
-#overlay-body {
-    margin-top: 20px;
+
+
+/* Fix for canvas rendering in overlay */
+#overlay-task-container {
+    width: 100%;
+    min-height: 500px;
+    overflow: visible !important;
+}
+
+#overlay-task-container canvas {
+    display: block !important;
+    visibility: visible !important;
+}
+
+.overlay-body {
+    overflow: visible !important;
 }
 
 .overlay video {
@@ -374,7 +388,7 @@ body {
     width: 100%;
     height: 100%;
     z-index: 8888;
-    pointer-events: none; /* Changed - allows clicks through to highlighted elements */
+    pointer-events: none;
 }
 
 .tutorial-overlay {
@@ -384,14 +398,22 @@ body {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.85);
-    pointer-events: none; /* Changed from auto to none - allows clicks through */
+    pointer-events: auto; /* Changed - blocks clicks on grey areas */
+    cursor: not-allowed;
 }
 
 .tutorial-highlighted {
     position: relative;
     z-index: 8889;
     box-shadow: 0 0 0 4px #3498db, 0 0 0 9999px rgba(0, 0, 0, 0.85);
-    pointer-events: auto; /* Ensure highlighted elements are clickable */
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+/* Disable interaction until Next is clicked */
+.tutorial-highlighted.interaction-disabled {
+    pointer-events: none !important;
+    cursor: not-allowed !important;
 }
 
 .tutorial-message-container {
@@ -399,12 +421,6 @@ body {
     z-index: 9999;
     pointer-events: auto;
     max-width: 90vw;
-}
-
-/* Default position: top-right */
-.tutorial-message-container {
-    top: 20px;
-    right: 20px;
 }
 
 /* Alternative positions based on what's highlighted */
@@ -529,6 +545,8 @@ body {
     padding: 20px;
     background-color: #fafafa;
     min-height: 400px;
+    max-height: 550px; /* Add max height */
+    overflow-y: auto; /* Add scroll */
 }
 
 .work-stats {
@@ -1017,4 +1035,226 @@ body {
 
 .game-container {
     position: relative;
+}
+
+/* ============================================
+   ROUTING TASK STYLES
+   ============================================ */
+
+.routing-task {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.task-instructions {
+    background-color: #e8f5e9;
+    padding: 15px 20px;
+    border-radius: 6px;
+    border-left: 4px solid #27ae60;
+    margin-bottom: 20px;
+}
+
+.task-instructions p {
+    margin: 8px 0;
+    color: #2c3e50;
+}
+
+.task-instructions ul {
+    margin: 10px 0 10px 20px;
+    color: #34495e;
+}
+
+.task-instructions strong {
+    color: #27ae60;
+}
+
+.task-body {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    max-height: 500px; /* Add max height */
+}
+
+/* Map Container */
+/* Map Container */
+.map-container {
+    flex: 0 0 350px; /* Reduced from 400px */
+}
+
+#routing-map {
+    border: 2px solid #34495e;
+    border-radius: 8px;
+    display: block;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 350px; /* Add explicit width */
+    height: 350px; /* Add explicit height */
+}
+
+.map-legend {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.map-legend > div {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.map-legend > div:last-child {
+    margin-bottom: 0;
+}
+
+.legend-color {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 10px;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Route Controls */
+.route-controls {
+    flex: 1;
+}
+
+.route-controls h4 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.route-info {
+    color: #7f8c8d;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.route-dropdowns {
+    margin-bottom: 20px;
+}
+
+.route-stop {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 15px;
+}
+
+.route-stop label {
+    min-width: 80px;
+    font-weight: 600;
+    color: #34495e;
+    font-size: 14px;
+}
+
+.route-dropdown {
+    flex: 1;
+    padding: 10px 12px;
+    border: 2px solid #bdc3c7;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.route-dropdown:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.route-dropdown:disabled {
+    background-color: #ecf0f1;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.route-dropdown option:disabled {
+    color: #95a5a6;
+}
+
+/* Route Summary */
+.route-summary {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 2px solid #ecf0f1;
+}
+
+.route-path {
+    font-size: 14px;
+    color: #34495e;
+    margin-bottom: 12px;
+    line-height: 1.6;
+    font-family: 'Courier New', monospace;
+    word-break: break-word;
+}
+
+.route-estimate {
+    font-size: 16px;
+    color: #2c3e50;
+}
+
+.route-estimate strong {
+    color: #27ae60;
+}
+
+#route-distance {
+    font-size: 20px;
+    font-weight: 700;
+    color: #27ae60;
+}
+
+/* Submit Button */
+.task-submit-btn {
+    width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .task-body {
+        flex-direction: column;
+    }
+    
+    .map-container {
+        flex: 1;
+        width: 100%;
+    }
+    
+    #routing-map {
+        width: 100%;
+        height: auto;
+    }
+    
+    .route-stop {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .route-stop label {
+        margin-bottom: 5px;
+    }
+}
+
+/* Help task counter in overlay */
+.help-stats {
+    background-color: #e8f5e9;
+    padding: 12px 20px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    border-left: 4px solid #27ae60;
+}
+
+.help-stats span {
+    font-size: 15px;
+    font-weight: 600;
+    color: #27ae60;
 }

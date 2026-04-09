@@ -218,28 +218,46 @@ class Overlay {
     }
 
     /**
-     * Load work tasks (for helping coworker)
-     */
-    loadWorkTasks(data) {
-        const isHelping = data.isHelping || false;
-        
-        this.bodyElement.innerHTML = `
-            <h2>${isHelping ? "Help Your Colleague" : "Your Tasks"}</h2>
-            <p>${isHelping ? "Complete tasks to help your colleague meet their deadline." : "Complete your assigned tasks."}</p>
-            <div id="overlay-task-container">
-                <p class="placeholder">Tasks will appear here...</p>
+ /**
+ * Load work tasks (for helping coworker)
+ */
+loadWorkTasks(data) {
+    const isHelping = data.isHelping || false;
+    
+    console.log('loadWorkTasks called with isHelping:', isHelping);
+    
+    this.bodyElement.innerHTML = `
+        <h2>${isHelping ? "Help Alex Martinez" : "Your Tasks"}</h2>
+        <p>${isHelping ? "Complete delivery routes to help Alex meet their deadline." : "Complete your assigned tasks."}</p>
+        ${isHelping ? `
+            <div class="help-stats">
+                <span id="help-completed-count">Routes completed for Alex: 0</span>
             </div>
-        `;
+        ` : ''}
+        <div id="overlay-task-container" style="width: 100%; position: relative;">
+            <p class="placeholder">Loading tasks...</p>
+        </div>
+    `;
+    
+    // Show close button
+    this.closeButton.style.display = 'block';
+    
+    console.log('About to call showTaskInterface...');
+    
+    // Load tasks if task system exists
+    if (this.experiment.taskSystem) {
+        const container = document.getElementById('overlay-task-container');
+        console.log('Container found:', !!container);
         
-        // Show close button
-        this.closeButton.style.display = 'block';
-        
-        // Load tasks if task system exists
-        if (this.experiment.taskSystem) {
-            const container = document.getElementById('overlay-task-container');
-            this.experiment.taskSystem.showTaskInterface(container, false, isHelping);
+        if (container) {
+            // Wait a bit longer for overlay to fully render
+            setTimeout(() => {
+                this.experiment.taskSystem.showTaskInterface(container, false, isHelping);
+                console.log('showTaskInterface called');
+            }, 300);
         }
     }
+}
 
     /**
      * Load Jira bug assignment system

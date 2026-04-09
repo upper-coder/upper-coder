@@ -175,14 +175,22 @@ createGamePanel() {
     /**
      * Initialize work panel
      */
-    initializeWorkPanel() {
-        const taskArea = document.getElementById('work-task-area');
-        
-        // Show task interface if task system exists and not already shown
-        if (this.experiment.taskSystem && taskArea.querySelector('.placeholder')) {
-            this.experiment.taskSystem.showTaskInterface(taskArea, false, false);
-        }
+initializeWorkPanel() {
+    const taskArea = document.getElementById('work-task-area');
+    
+    // Update containerElement to point to work container
+    if (this.experiment.taskSystem) {
+        this.experiment.taskSystem.containerElement = this.experiment.taskSystem.workContainer || taskArea;
     }
+    
+    // Update work stats counter
+    this.updateWorkStats();
+    
+    // Show task interface if task system exists and not already shown
+    if (this.experiment.taskSystem && taskArea.querySelector('.placeholder')) {
+        this.experiment.taskSystem.showTaskInterface(taskArea, false, false);
+    }
+}
 
     /**
      * Initialize game panel
@@ -347,6 +355,10 @@ createGamePanel() {
             if (!gameRunning) {
                 resetGame();
                 startGame();
+            // Resume clock when game actually starts (during tutorial)
+                if (this.experiment.clock && this.experiment.clock.isPaused) {
+                    this.experiment.clock.resume();
+                }
             }
             
             // Change direction
@@ -409,17 +421,17 @@ createGamePanel() {
         return this.currentPanel;
     }
 
-    /**
-     * Update work task counter
-     */
-    updateWorkStats() {
-        if (!this.experiment.taskSystem) return;
-        
-        const stats = this.experiment.taskSystem.getPerformanceStats();
-        const counterElement = document.getElementById('work-completed-count');
-        
-        if (counterElement) {
-            counterElement.textContent = `Completed: ${stats.total} (${Math.round(stats.accuracy * 100)}% correct)`;
-        }
+/**
+ * Update work task counter
+ */
+updateWorkStats() {
+    if (!this.experiment.taskSystem) return;
+    
+    const stats = this.experiment.taskSystem.getPerformanceStats();
+    const counterElement = document.getElementById('work-completed-count');
+    
+    if (counterElement) {
+        counterElement.textContent = `Completed: ${stats.total} (Avg: ${stats.averageEfficiencyPercent}%)`;
     }
+}
 }

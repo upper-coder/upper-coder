@@ -5,16 +5,17 @@
  */
 
 class Tutorial {
-    constructor(experiment) {
-        this.experiment = experiment;
-        this.currentStep = 0;
-        this.steps = [];
-        this.isActive = false;
-        this.highlightedElements = []; // Changed to array for multiple highlights
-        this.emailCount = 0;
-        
-        this.createSpotlightElements();
-    }
+constructor(experiment) {
+    this.experiment = experiment;
+    this.currentStep = 0;
+    this.steps = [];
+    this.isActive = false;
+    this.highlightedElements = [];
+    this.emailCount = 0;
+    this.emailsReadDuringTutorial = new Set(); // ADD THIS
+    
+    this.createSpotlightElements();
+}
 
     /**
      * Create spotlight overlay elements
@@ -71,33 +72,32 @@ class Tutorial {
             const isFirst = i === 0;
             const isLast = i === this.emailCount - 1;
             
+steps.push({
+    id: `open_email_${emailNum}`,
+    message: isFirst ? 
+        'Click on any email in the list to read it.' : 
+        `Now click on ${isLast ? 'the last' : 'another'} unread email (marked with blue background).`,
+    highlight: ['#email-list', '.folder-item.active', '#email-viewer-pane'], // Added viewer pane
+    action: 'wait_for_email_open',
+    validation: () => this.emailOpenedAndTracked(emailNum),
+    checkInterval: 500,
+    onEnter: () => this.addUnreadPulse()
+});      
             steps.push({
-                id: `open_email_${emailNum}`,
-                message: isFirst ? 
-                    'Click on any email in the list to read it.' : 
-                    `Now click on ${isLast ? 'the last' : 'another'} unread email (marked with blue background).`,
-                highlight: ['#email-list'],
-                action: 'wait_for_email_open',
-                validation: () => this.anyEmailOpened(),
-                checkInterval: 500,
-                onEnter: () => this.addUnreadPulse()
-            });
-            
-            steps.push({
-                id: `read_email_${emailNum}`,
-                message: isFirst ? 
-                    'Great! This is the email content. Take your time to read it.' : 
-                    'Read this email content.',
-                highlight: ['#email-viewer-pane'],
-                action: 'click_next',
-                onEnter: () => {
-                    this.removeUnreadPulse();
-                    // Deliver wellness email while reading the LAST email
-                    if (isLast) {
-                        this.deliverWellnessEmail();
-                    }
-                }
-            });
+    id: `read_email_${emailNum}`,
+    message: isFirst ? 
+        'Great! This is the email content. Take your time to read it.' : 
+        'Read this email content.',
+    highlight: ['#email-viewer-pane', '.folder-item.active'], // ADD inbox button here
+    action: 'click_next',
+    onEnter: () => {
+        this.removeUnreadPulse();
+        // Deliver wellness email while reading the LAST email
+        if (isLast) {
+            this.deliverWellnessEmail();
+        }
+    }
+});
             
             steps.push({
                 id: `return_inbox_${emailNum}`,
@@ -112,19 +112,29 @@ class Tutorial {
         }
         
         steps.push(
-            {
+{
                 id: 'new_email_notice',
                 message: 'Great! Notice the new email that just arrived at the top of your inbox.',
-                highlight: ['.email-item[data-email-id="wellness_email"]'],
-                action: 'click_next'
+                highlight: null,  // Will be set dynamically
+                action: 'click_next',
+                onEnter: () => {
+                    // Set highlight dynamically
+                    const selector = this.getWellnessEmailSelector();
+                    this.highlightElements([selector]);
+                }
             },
-           {
+            {
                 id: 'open_wellness',
                 message: 'Please click on this email to open it.',
-                highlight: ['.email-item[data-email-id="wellness_email"]'],
+                highlight: null,  // Will be set dynamically
                 action: 'wait_for_email_open',
                 validation: () => this.anyEmailOpened(),
-                checkInterval: 500
+                checkInterval: 500,
+                onEnter: () => {
+                    // Set highlight dynamically
+                    const selector = this.getWellnessEmailSelector();
+                    this.highlightElements([selector]);
+                }
             },
             {
                 id: 'read_wellness',
@@ -186,36 +196,71 @@ class Tutorial {
                     this.triggerBossVideo();
                 }
             },
-            {
+{
                 id: 'work_intro',
-                message: 'Time to start work. Click the Work button to see your tasks.',
+                message: 'Time to start work. At Optimo, your task is to plan optimal delivery routes for our clients. Click the Work button to begin!',
                 highlight: ['#work-btn'],
                 action: 'open_work',
                 onEnter: () => this.enableWorkButton(),
                 validation: () => this.workOpened(),
                 checkInterval: 500
             },
+{
+    id: 'practice_task',
+    message: 'Plan an efficient delivery route for this client. Select stops in order to minimize total distance, then submit your route.',
+    highlight: ['#work-task-area'],
+    action: 'complete_practice',
+    validation: () => this.practiceCompleted(),
+    checkInterval: 1000,
+    onEnter: () => {
+        // Pause clock during practice task
+        if (this.experiment.clock && this.experiment.clock.isRunning && !this.experiment.clock.isPaused) {
+            this.experiment.clock.pause();
+        }
+        
+        // Show practice task explicitly
+        if (this.experiment.taskSystem) {
+            const taskArea = document.getElementById('work-task-area');
+            if (taskArea) {
+                this.experiment.taskSystem.showTaskInterface(taskArea, true, false);  // isPractice = TRUE!
+            }
+        }
+    }
+},
+{
+    id: 'ready_for_work',
+    message: 'Excellent work! You\'re now ready to start your workday at Optimo.',
+    highlight: null,
+    action: 'click_next',
+    onEnter: () => {
+        // Switch back to email panel first
+        if (this.experiment.panelManager) {
+            this.experiment.panelManager.switchPanel('email');
+        }
+        
+        // Jump clock to 9:30 AM
+        if (this.experiment.clock) {
+            this.experiment.clock.jumpTo(9, 30);
+            // Resume clock
+            if (this.experiment.clock.isPaused) {
+                this.experiment.clock.resume();
+            }
+        }
+    }
+},
             {
-                id: 'practice_task',
-                message: 'Let\'s try a practice task. Complete this one to continue.',
-                highlight: ['#work-task-area'],
-                action: 'complete_practice',
-                validation: () => this.practiceCompleted(),
-                checkInterval: 1000
-            },
-            {
-                id: 'bonus_explanation',
-                message: 'Great! Your bonus will be based on your task performance and what you learned about the organization. You have until 5:00 PM. Good luck!',
+                id: 'final_reminder',
+                message: 'Your bonus will be based on your task performance and other factors. Work efficiently and check your emails regularly.',
                 highlight: ['#header'],
                 action: 'click_next'
             },
-            {
-                id: 'tutorial_complete',
-                message: 'Tutorial complete! The simulation will now begin.',
-                highlight: null,
-                action: 'end_tutorial',
-                onEnter: () => this.completeTutorial()
-            }
+{
+    id: 'tutorial_complete',
+    message: 'Tutorial complete! You have until 5:00 PM Click "Next" when you\'re ready to begin.',
+    highlight: null,
+    action: 'click_next'
+    // Remove the onEnter completely
+}
         );
         
         return steps;
@@ -296,15 +341,21 @@ class Tutorial {
         console.log('Tutorial step:', step.id);
     }
 
-    startValidationCheck(step) {
+startValidationCheck(step) {
         if (this.validationInterval) {
             clearInterval(this.validationInterval);
         }
         
+        console.log('Starting validation for step:', step.id);
+        
         this.validationInterval = setInterval(() => {
+            console.log('Checking validation for:', step.id);
             if (step.validation && step.validation()) {
+                console.log('✓ Validation passed! Advancing...');
                 clearInterval(this.validationInterval);
                 this.advance();
+            } else {
+                console.log('✗ Validation failed, will check again');
             }
         }, step.checkInterval);
     }
@@ -384,13 +435,36 @@ class Tutorial {
     }
 
     // Validation Methods
-    anyEmailOpened() {
-        if (!this.experiment.emailSystem) return false;
-        const viewer = document.getElementById('email-viewer-pane');
-        return this.experiment.emailSystem.currentlyOpen !== null && 
-               viewer && 
-               viewer.style.display !== 'none';
+/**
+ * Check if an email is open AND we've read the required number of unique emails
+ */
+emailOpenedAndTracked(requiredCount) {
+    if (!this.experiment.emailSystem) return false;
+    
+    const viewer = document.getElementById('email-viewer-pane');
+    const isViewerOpen = this.experiment.emailSystem.currentlyOpen !== null && 
+           viewer && 
+           viewer.style.display !== 'none';
+    
+    // If an email is currently open, track it
+    if (isViewerOpen && this.experiment.emailSystem.currentlyOpen) {
+        const emailId = this.experiment.emailSystem.currentlyOpen;
+        if (!this.emailsReadDuringTutorial.has(emailId)) {
+            this.emailsReadDuringTutorial.add(emailId);
+            console.log(`Email read: ${emailId}. Total unique emails read: ${this.emailsReadDuringTutorial.size}`);
+        }
     }
+    
+    // Only advance if we've read enough unique emails AND an email is currently open
+    return this.emailsReadDuringTutorial.size >= requiredCount && isViewerOpen;
+}    
+anyEmailOpened() {
+    if (!this.experiment.emailSystem) return false;
+    const viewer = document.getElementById('email-viewer-pane');
+    return this.experiment.emailSystem.currentlyOpen !== null && 
+           viewer && 
+           viewer.style.display !== 'none';
+}
 
     inboxClicked() {
         if (!this.experiment.emailSystem) return false;
@@ -418,8 +492,21 @@ class Tutorial {
         return this.experiment.panelManager.getCurrentPanel() === 'work';
     }
 
-    practiceCompleted() {
-        return this.practiceTaskDone || false;
+practiceCompleted() {
+        // Check tutorial flag first
+        if (this.practiceTaskDone) {
+            console.log('Practice complete: TRUE (tutorial flag)');
+            return true;
+        }
+        
+        // Check task system flag
+        if (this.experiment.taskSystem && this.experiment.taskSystem.practiceComplete) {
+            console.log('Practice complete: TRUE (task system flag)');
+            return true;
+        }
+        
+        console.log('Practice complete: FALSE');
+        return false;
     }
 
     // Helper Methods
@@ -439,7 +526,8 @@ class Tutorial {
 
     deliverWellnessEmail() {
         if (this.experiment.emailSystem) {
-            this.experiment.emailSystem.deliverEmail('wellness_email', true);
+            const wellnessId = this.experiment.emailSystem.wellnessEmailId || 'wellness_paradox';
+            this.experiment.emailSystem.deliverEmail(wellnessId, true);
         }
     }
 
@@ -495,14 +583,15 @@ class Tutorial {
         }
     }
 
-    markPracticeComplete() {
-        this.practiceTaskDone = true;
-    }
-
     completeTutorial() {
         console.log('Tutorial complete, transitioning to free play');
         setTimeout(() => {
             this.end();
         }, 2000);
     }
+        getWellnessEmailSelector() {
+        const wellnessId = this.experiment.emailSystem.wellnessEmailId || 'wellness_paradox';
+        return `.email-item[data-email-id="${wellnessId}"]`;
+    }
 }
+

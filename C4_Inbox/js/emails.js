@@ -19,6 +19,19 @@ class EmailSystem {
         this.setupInboxFolderClick();
     }
 
+
+    /**
+ * Shuffle array using Fisher-Yates algorithm
+ */
+shuffleArray(array) {
+    const shuffled = [...array]; // Create a copy
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
         /**
      * Set up inbox folder click handler
      */
@@ -40,40 +53,68 @@ class EmailSystem {
      * Load emails from JSON file
      */
     async loadEmails(condition) {
-        try {
-            const response = await fetch('data/emails.json');
-            this.emailData = await response.json();
-            
-            // Get emails for this condition
-            const conditionData = this.emailData.conditions[condition];
-            
-            if (!conditionData) {
-                console.error('Condition not found:', condition);
-                return false;
-            }
-            
-            // Load initial emails
-            this.emails = conditionData.initial_emails.map(id => 
-                this.emailData.emails[id]
-            );
-            
-            // Also store references to critical emails
-            this.criticalEmails = {
-                wellness: this.emailData.emails.wellness_email,
-                prosocial: this.emailData.emails[conditionData.critical_emails.prosocial],
-                competition: this.emailData.emails[conditionData.critical_emails.competition]
-            };
-            
-            console.log('Emails loaded for condition:', condition);
-            console.log('Initial emails:', this.emails.length);
-            
-            return true;
-            
-        } catch (error) {
-            console.error('Error loading emails:', error);
+    try {
+        const response = await fetch('data/emails.json');
+        this.emailData = await response.json();
+        
+        // Get emails for this condition
+        const conditionData = this.emailData.conditions[condition];
+        
+        if (!conditionData) {
+            console.error('Condition not found:', condition);
             return false;
         }
+        
+        // Get the pool of initial email IDs
+        const emailPool = conditionData.initial_emails;
+        
+        let selectedIds;
+        
+        if (conditionData.inconsistency === 'low') {
+            // For low: need exactly 2 coop + 2 comp
+            const coopPool = emailPool.filter(id => id.startsWith('coop_'));
+            const compPool = emailPool.filter(id => id.startsWith('comp_'));
+            
+            // Randomly select 2 from each pool
+            const selectedCoop = this.shuffleArray(coopPool).slice(0, 2);
+            const selectedComp = this.shuffleArray(compPool).slice(0, 2);
+            
+            selectedIds = [...selectedCoop, ...selectedComp];
+            
+        } else if (conditionData.inconsistency.startsWith('none')) {
+            // For none: randomly select 4 from the pool (all same type)
+            selectedIds = this.shuffleArray(emailPool).slice(0, 4);
+            
+        } else if (conditionData.inconsistency === 'high') {
+            // For high: use all 8 emails
+            selectedIds = this.shuffleArray(emailPool); // Shuffle but use all
+        }
+        
+        // Load the selected emails
+        this.emails = selectedIds.map(id => this.emailData.emails[id]);
+        
+        // Also store references to critical emails
+        this.criticalEmails = {
+            wellness: this.emailData.emails[conditionData.wellness_email],
+            prosocial: this.emailData.emails[conditionData.critical_emails.prosocial],
+            competition: this.emailData.emails[conditionData.critical_emails.competition]
+        };
+        
+        // Store wellness email ID for tutorial delivery
+        this.wellnessEmailId = conditionData.wellness_email;
+        
+        console.log('Emails loaded for condition:', condition);
+        console.log('Inconsistency level:', conditionData.inconsistency);
+        console.log('Selected email IDs:', selectedIds);
+        console.log('Initial emails:', this.emails.length);
+        
+        return true;
+        
+    } catch (error) {
+        console.error('Error loading emails:', error);
+        return false;
     }
+}
 
     /**
      * Get initial emails (shown at start of tutorial)
@@ -83,19 +124,22 @@ class EmailSystem {
     }
 
     /**
-     * Deliver initial emails to inbox
-     */
-    deliverInitialEmails() {
-        // Clear the email list first
-        this.listElement.innerHTML = '';
-        
-        // Deliver each initial email
-        this.emails.forEach(email => {
-            this.deliverEmail(email.id, false);
-        });
-        
-        console.log('Initial emails delivered:', this.emails.length);
-    }
+ * Deliver initial emails to inbox (in randomized order)
+ */
+deliverInitialEmails() {
+    // Clear the email list first
+    this.listElement.innerHTML = '';
+    
+    // Randomize the order of initial emails
+    const shuffledEmails = this.shuffleArray(this.emails);
+    
+    // Deliver each email in random order
+    shuffledEmails.forEach(email => {
+        this.deliverEmail(email.id, false);
+    });
+    
+    console.log('Initial emails delivered in randomized order:', shuffledEmails.map(e => e.id));
+}
 
     /**
      * Add email to inbox
@@ -359,48 +403,91 @@ class EmailSystem {
         console.log('Email viewer closed, returned to inbox');
     }
 
-    /**
-     * Submit email response
-     */
-    submitResponse(emailId) {
-        const responseText = document.getElementById('email-reply-text').value.trim();
+submitResponse(emailId) {
+    const responseText = document.getElementById('email-reply-text').value.trim();
+    
+    if (!responseText) {
+        alert('Please enter a response');
+        return;
+    }
+    
+    const state = this.emailStates[emailId];
+    
+    if (!state) {
+        console.error('Email state not found:', emailId);
+        return;
+    }
+    
+    // Create response object
+    const response = {
+        text: responseText,
+        timestamp: Date.now(),
+        emailType: this.getEmailType(emailId)
+    };
+    
+    // Special handling for competition email - record Jira state at time of response
+    if (emailId === 'competition_email') {
+        const jiraState = this.experiment.overlay ? this.experiment.overlay.getJiraState() : null;
         
-        if (!responseText) {
-            alert('Please enter a response');
-            return;
+        if (jiraState) {
+            response.jiraData = {
+                actualBugs: jiraState.actualBugs,
+                currentBugs: jiraState.getParticipantBugs(),
+                reassignments: [...jiraState.reassignments] // Copy array
+            };
         }
         
-        const state = this.emailStates[emailId];
-        
-        if (!state) {
-            console.error('Email state not found:', emailId);
-            return;
-        }
-        
-        state.response = {
-            text: responseText,
-            timestamp: Date.now()
-        };
-        
-        // Track event
+        // Track competition email interaction
         if (this.experiment.tracker && this.experiment.tracker.isTracking) {
-            this.experiment.tracker.logEvent('email_response', {
-                emailId: emailId,
-                responseLength: responseText.length
+            this.experiment.tracker.updateEmailTracking('competition_email', {
+                opened: true,
+                responseProvided: true,
+                totalResponses: state.responses.length + 1,
+                latestResponse: responseText,
+                jiraChecked: jiraState !== null,
+                bugsAtResponse: jiraState ? jiraState.getParticipantBugs() : null
             });
         }
         
-        console.log('Response submitted for:', emailId);
-        
-        // Show confirmation
-        alert('Response sent!');
-        
-        // Clear text area
-        const textArea = document.getElementById('email-reply-text');
-        if (textArea) {
-            textArea.value = '';
+        console.log('Competition email response recorded with Jira data');
+    }
+    
+    // Track prosocial email responses too
+    if (emailId === 'prosocial_email') {
+        if (this.experiment.tracker && this.experiment.tracker.isTracking) {
+            this.experiment.tracker.updateEmailTracking('prosocial_email', {
+                opened: true,
+                responseProvided: true,
+                totalResponses: state.responses.length + 1,
+                latestResponse: responseText
+            });
         }
     }
+    
+    // Add response to array
+    state.responses.push(response);
+    
+    // Track event
+    if (this.experiment.tracker && this.experiment.tracker.isTracking) {
+        this.experiment.tracker.logEvent('email_response', {
+            emailId: emailId,
+            emailType: response.emailType,
+            responseLength: responseText.length,
+            responseNumber: state.responses.length
+        });
+    }
+    
+    console.log('Response submitted for:', emailId, '(Response #' + state.responses.length + ')');
+    
+    // Show confirmation
+    alert('Response sent!');
+    
+    // Clear text area
+    const textArea = document.getElementById('email-reply-text');
+    if (textArea) {
+        textArea.value = '';
+    }
+}
 
     /**
      * Update inbox count
@@ -431,20 +518,20 @@ class EmailSystem {
     /**
      * Get all email tracking data for export
      */
-    getTrackingData() {
-        return {
-            emailStates: this.emailStates,
-            readOrder: Object.entries(this.emailStates)
-                .filter(([id, state]) => state.readOrder !== null)
-                .sort((a, b) => a[1].readOrder - b[1].readOrder)
-                .map(([id, state]) => ({
-                    emailId: id,
-                    order: state.readOrder,
-                    firstOpenTime: state.firstOpenTime,
-                    totalTimeOpen: state.totalTimeOpen,
-                    timesOpened: state.timesOpened,
-                    response: state.response
-                }))
-        };
-    }
+getTrackingData() {
+    return {
+        emailStates: this.emailStates,
+        readOrder: Object.entries(this.emailStates)
+            .filter(([id, state]) => state.readOrder !== null)
+            .sort((a, b) => a[1].readOrder - b[1].readOrder)
+            .map(([id, state]) => ({
+                emailId: id,
+                order: state.readOrder,
+                firstOpenTime: state.firstOpenTime,
+                totalTimeOpen: state.totalTimeOpen,
+                timesOpened: state.timesOpened,
+                responses: state.responses // Now an array of all responses
+            }))
+    };
+}
 }

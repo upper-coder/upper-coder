@@ -86,15 +86,18 @@
     <!-- Config must be first -->
     <script src="js/config.js"></script>
     
-    <!-- Core systems (order doesn't matter much here) -->
+<!-- Load all JavaScript files in correct order -->
+    <script src="js/config.js"></script>
+    <script src="js/pathfinding.js"></script> <!-- Make sure this is here -->
     <script src="js/clock.js"></script>
     <script src="js/emails.js"></script>
     <script src="js/overlay.js"></script>
     <script src="js/tutorial.js"></script>
-    <script src="js/tasks.js"></script>
     <script src="js/panels.js"></script>
+    <script src="js/tasks.js"></script>
     <script src="js/tracking.js"></script>
     <script src="js/datapipe.js"></script>
+    <script src="js/experiment.js"></script>
     
     <!-- Main experiment controller must be last -->
     <script src="js/experiment.js"></script>
