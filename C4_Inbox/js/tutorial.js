@@ -54,7 +54,7 @@ constructor(experiment) {
         const steps = [
             {
                 id: 'welcome',
-                message: 'Welcome to your first day at Acme Corp! Let me show you around your workspace.',
+                message: 'Welcome to your first day at Optimo! Let me show you around your workspace.',
                 highlight: null,
                 action: 'click_next'
             },

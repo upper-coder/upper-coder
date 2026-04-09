@@ -158,18 +158,18 @@ deliverInitialEmails() {
             return;
         }
 
-        // Initialize state
-        this.emailStates[emailId] = {
-            delivered: true,
-            deliveryTime: Date.now(),
-            firstOpenTime: null,
-            totalTimeOpen: 0,
-            openStartTime: null,
-            timesOpened: 0,
-            isRead: false,
-            response: null,
-            readOrder: null
-        };
+// Initialize state
+this.emailStates[emailId] = {
+    delivered: true,
+    deliveryTime: Date.now(),
+    firstOpenTime: null,
+    totalTimeOpen: 0,
+    openStartTime: null,
+    timesOpened: 0,
+    isRead: false,
+    responses: [],  // ✅ CHANGED TO ARRAY
+    readOrder: null
+};
 
         // Add to DOM
         this.renderEmailInList(email, animate);
@@ -488,6 +488,18 @@ submitResponse(emailId) {
         textArea.value = '';
     }
 }
+
+    /**
+     * Get email type for categorization
+     */
+    getEmailType(emailId) {
+        if (emailId === 'competition_email') return 'competition';
+        if (emailId === 'prosocial_email') return 'prosocial';
+        if (emailId.startsWith('wellness_')) return 'wellness';
+        if (emailId.startsWith('coop_')) return 'cooperative';
+        if (emailId.startsWith('comp_')) return 'competitive';
+        return 'other';
+    }
 
     /**
      * Update inbox count

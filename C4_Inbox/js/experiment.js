@@ -7,7 +7,7 @@
 class Experiment {
     constructor() {
         this.state = {
-            phase: 'INIT', // INIT, TUTORIAL, FREE_PLAY, COMPLETE
+            phase: 'INIT', // INIT, CONSENT, INTRO, TUTORIAL, FREE_PLAY, COMPLETE
             condition: null,
             inconsistency: null,
             mindset: null,
@@ -17,12 +17,15 @@ class Experiment {
         };
         
         this.data = {
+            consent: {},
             tutorial: {},
             freePlay: {},
             tracking: []
         };
         
-        // Component references
+        // Component references (initialized later)
+        this.consentForm = null;
+        this.introPages = null; // TODO: Will be implemented later
         this.clock = null;
         this.emailSystem = null;
         this.taskSystem = null;
@@ -30,6 +33,8 @@ class Experiment {
         this.overlay = null;
         this.tracker = null;
         this.panelManager = null;
+        this.dataPipe = null;
+        this.survey = null;
         
         // Condition list for balanced randomization
         this.conditionList = [
@@ -53,21 +58,101 @@ class Experiment {
     async init() {
         console.log('Initializing experiment...');
         
+        this.state.phase = 'CONSENT';
+        
         // Assign condition
         this.assignCondition();
         
         // Generate participant ID
         this.generateParticipantId();
         
-        // Initialize all components
-        await this.initializeComponents();
+        // Initialize basic systems
+        this.initializeBasicSystems();
         
         console.log('Experiment initialized', this.state);
+        
+        // Show consent form first
+        this.consentForm.show();
+        
+        // Everything else happens after consent in startAfterConsent()
+    }
+
+    /**
+     * Initialize basic systems (consent, datapipe, survey)
+     */
+    initializeBasicSystems() {
+        // Initialize consent form
+        this.consentForm = new ConsentForm(this);
+        
+        // Initialize DataPipe
+        this.dataPipe = new DataPipe(this);
+        
+        // Initialize survey
+        this.survey = new Survey(this);
+        
+        console.log('✓ Basic systems initialized');
+    }
+
+    /**
+     * Start experiment after consent (and intro pages when implemented)
+     * Called by consent form or intro pages
+     */
+    async startAfterConsent() {
+        console.log('Starting experiment after consent...');
+        
+        this.state.phase = 'TUTORIAL';
+        
+        // Initialize all experiment components
+        await this.initializeExperimentComponents();
+        
+        // Load emails for this condition
+        const emailsLoaded = await this.emailSystem.loadEmails(this.state.condition);
+        
+        if (!emailsLoaded) {
+            console.error('Failed to load emails');
+            alert('Error loading experiment content. Please refresh and try again.');
+            return;
+        }
+        
+        // Deliver initial emails to inbox
+        this.emailSystem.deliverInitialEmails();
         
         // Start tutorial after brief delay
         setTimeout(() => {
             this.startTutorial();
         }, 1000);
+        
+        console.log('✓ Experiment started');
+    }
+
+    /**
+     * Initialize all experiment components (after consent)
+     */
+    async initializeExperimentComponents() {
+        // Start clock but immediately pause it (tutorial will control it)
+        this.clock = new Clock();
+        this.clock.start();
+        this.clock.pause();
+        
+        // Create overlay system
+        this.overlay = new Overlay(this);
+        
+        // Create email system (emails loaded separately)
+        this.emailSystem = new EmailSystem(this);
+        
+        // Create task system
+        this.taskSystem = new TaskSystem(this);
+        
+        // Create tracking system
+        this.tracker = new Tracker(this);
+        
+        // Create panel system
+        this.panelManager = new PanelManager(this);
+        
+        // Create tutorial system
+        this.tutorial = new Tutorial(this);
+        
+        console.log('✓ All experiment systems initialized');
     }
 
     /**
@@ -154,38 +239,6 @@ class Experiment {
     }
 
     /**
-     * Initialize all system components
-     */
-    async initializeComponents() {
-        // Start clock but immediately pause it (tutorial will control it)
-        this.clock = new Clock();
-        this.clock.start();
-        this.clock.pause();
-        
-        // Create overlay system
-        this.overlay = new Overlay(this);
-        
-        // Create and load email system with condition-specific emails
-        this.emailSystem = new EmailSystem(this);
-        await this.emailSystem.loadEmails(this.state.condition);
-        this.emailSystem.deliverInitialEmails();
-        
-        // Create task system
-        this.taskSystem = new TaskSystem(this);
-        
-        // Create tracking system
-        this.tracker = new Tracker(this);
-        
-        // Create panel system
-        this.panelManager = new PanelManager(this);
-        
-        // Create tutorial system
-        this.tutorial = new Tutorial(this);
-        
-        console.log('✓ All systems initialized');
-    }
-
-    /**
      * Start tutorial phase
      */
     startTutorial() {
@@ -197,10 +250,10 @@ class Experiment {
     /**
      * Start free play phase
      */
-startFreePlay() {    
-    console.log('Starting free play...');
-    this.state.phase = 'FREE_PLAY';
-    this.state.startTime = Date.now();
+    startFreePlay() {    
+        console.log('Starting free play...');
+        this.state.phase = 'FREE_PLAY';
+        this.state.startTime = Date.now();
         
         // Enable tracking when free play starts
         if (this.tracker) {
@@ -229,44 +282,44 @@ startFreePlay() {
     /**
      * Schedule critical emails at random times
      */
-scheduleCriticalEmails() {
-    // Don't schedule if tutorial is still active
-    if (this.tutorial && this.tutorial.isActive) {
-        console.log('⚠️ Tutorial still active, delaying email scheduling...');
-        setTimeout(() => this.scheduleCriticalEmails(), 1000);
-        return;
+    scheduleCriticalEmails() {
+        // Don't schedule if tutorial is still active
+        if (this.tutorial && this.tutorial.isActive) {
+            console.log('⚠️ Tutorial still active, delaying email scheduling...');
+            setTimeout(() => this.scheduleCriticalEmails(), 1000);
+            return;
+        }
+        
+        // Random times between 5 and 15 minutes (in real time)
+        const minDelay = 5 * 60 * 1000; // 5 minutes
+        const maxDelay = 15 * 60 * 1000; // 15 minutes
+        
+        // Random delay for prosocial email
+        const prosocialDelay = Math.random() * (maxDelay - minDelay) + minDelay;
+        
+        // Random delay for competition email
+        const competitionDelay = Math.random() * (maxDelay - minDelay) + minDelay;
+        
+        // Schedule prosocial email
+        setTimeout(() => {
+            if (this.emailSystem && this.state.phase === 'FREE_PLAY') {
+                this.emailSystem.deliverEmail('prosocial_email', true);
+                console.log('📧 Prosocial email delivered');
+            }
+        }, prosocialDelay);
+        
+        // Schedule competition email
+        setTimeout(() => {
+            if (this.emailSystem && this.state.phase === 'FREE_PLAY') {
+                this.emailSystem.deliverEmail('competition_email', true);
+                console.log('📧 Competition email delivered');
+            }
+        }, competitionDelay);
+        
+        console.log(`📅 Critical emails scheduled:`);
+        console.log(`   - Prosocial: ${Math.round(prosocialDelay/1000)}s (${Math.round(prosocialDelay/60000)} min)`);
+        console.log(`   - Competition: ${Math.round(competitionDelay/1000)}s (${Math.round(competitionDelay/60000)} min)`);
     }
-    
-    // Random times between 5 and 15 minutes (in real time)
-    const minDelay = 5  * 50 * 1000; // 5 minutes
-    const maxDelay = 15 * 60 *  1000; // 15 minutes
-    
-    // Random delay for prosocial email
-    const prosocialDelay = Math.random() * (maxDelay - minDelay) + minDelay;
-    
-    // Random delay for competition email
-    const competitionDelay = Math.random() * (maxDelay - minDelay) + minDelay;
-    
-    // Schedule prosocial email
-    setTimeout(() => {
-        if (this.emailSystem && this.state.phase === 'FREE_PLAY') {
-            this.emailSystem.deliverEmail('prosocial_email', true);
-            console.log('📧 Prosocial email delivered');
-        }
-    }, prosocialDelay);
-    
-    // Schedule competition email
-    setTimeout(() => {
-        if (this.emailSystem && this.state.phase === 'FREE_PLAY') {
-            this.emailSystem.deliverEmail('competition_email', true);
-            console.log('📧 Competition email delivered');
-        }
-    }, competitionDelay);
-    
-    console.log(`📅 Critical emails scheduled:`);
-    console.log(`   - Prosocial: ${Math.round(prosocialDelay/1000)}s (${Math.round(prosocialDelay/60000)} min)`);
-    console.log(`   - Competition: ${Math.round(competitionDelay/1000)}s (${Math.round(competitionDelay/60000)} min)`);
-}
 
     /**
      * End experiment and show exit survey
@@ -285,51 +338,14 @@ scheduleCriticalEmails() {
             this.tracker.stopTracking();
         }
         
-        // Save all data
-        this.saveData();
-        
-        // Show completion message (TODO: redirect to exit survey)
-        alert('Experiment complete! Thank you for participating.\n\nYour data has been saved.');
-        
-        // TODO: Redirect to exit survey or show built-in survey
-        console.log('TODO: Redirect to exit survey');
-    }
-
-    /**
-     * Save all collected data
-     */
-    async saveData() {
-        console.log('Saving data...');
-        
-        // Compile all data
-        const experimentData = {
-            participant: {
-                id: this.state.participantId,
-                condition: this.state.condition,
-                inconsistency: this.state.inconsistency,
-                mindset: this.state.mindset
-            },
-            timeline: {
-                startTime: this.state.startTime,
-                endTime: Date.now(),
-                duration: Date.now() - this.state.startTime
-            },
-            tutorial: this.data.tutorial,
-            tracking: this.tracker ? this.tracker.getAllData() : {},
-            emails: this.emailSystem ? this.emailSystem.getTrackingData() : {},
-            timestamp: new Date().toISOString()
-        };
-        
-        console.log('Experiment data compiled:', experimentData);
-        
-        // TODO: Send to DataPipe
-        if (this.tracker) {
-            await this.tracker.exportToDataPipe();
+        // Start exit survey (which will handle data export on completion)
+        if (this.survey) {
+            console.log('Starting exit survey...');
+            this.survey.start();
+        } else {
+            console.error('Survey system not initialized!');
+            alert('Error: Survey system not found. Please contact the researcher.');
         }
-        
-        // Also save to localStorage as backup
-        localStorage.setItem(`experiment_data_${this.state.participantId}`, JSON.stringify(experimentData));
-        console.log('✓ Data saved to localStorage as backup');
     }
 }
 
