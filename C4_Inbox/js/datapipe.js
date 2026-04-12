@@ -54,18 +54,29 @@ async exportData() {
         console.log('Sending data to DataPipe...');
         console.log('Filename:', filename);
 
-        // Send to DataPipe - FIX THE REQUEST FORMAT
-        const response = await fetch('https://pipe.jspsych.org/api/data/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                experimentID: this.experimentId,
-                filename: filename,
-                data: dataString  // DataPipe expects the data as a STRING
-            })
-        });
+const requestBody = {
+    experimentID: this.experimentId,
+    filename: filename,
+    data: dataString
+};
+
+console.log('Request body:', requestBody);
+console.log('Experiment ID:', this.experimentId);
+console.log('Filename:', filename);
+console.log('Data length:', dataString.length);
+
+        // Send to DataPipe
+const response = await fetch('https://pipe.jspsych.org/api/data/', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+        experimentID: this.experimentId,  // This is required
+        filename: filename,               // This is required
+        data: dataString                  // This should be the JSON string of your data
+    })
+});
 
         if (!response.ok) {
             const errorText = await response.text();
