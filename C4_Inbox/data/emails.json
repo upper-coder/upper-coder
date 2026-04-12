@@ -89,66 +89,66 @@
   "emails": {
     "coop_001": {
       "id": "coop_001",
-      "from": "Team Lead",
-      "subject": "TODO: Cooperative cue email 1",
-      "body": "TODO: Add content emphasizing cooperation",
+      "from": "Sarah Chen (Manager)",
+      "subject": "Welcome Back!",
+      "body": "Welcome to a new year at Optimo! I sincerely hope everyone had a restful holiday season and would like to extend a warm welcome back to work. At a time of significant change, I hope we can affirm our commitment to excellence. In true Optimo fashion, we hope each and every one of us here continues to contribute to Optimo's atmosphere of cooperation and support. Remember, all for one, and one for all. We rise and fall together not just as an organization but as a family.",
       "canReply": true,
       "requiresReply": false
     },
     "coop_002": {
       "id": "coop_002",
-      "from": "Colleague",
-      "subject": "TODO: Cooperative cue email 2",
-      "body": "TODO: Add content emphasizing cooperation",
+      "from": "Sarah Chen (Manager)",
+      "subject": "Good Work Team!",
+      "body": "Hey everyone, just wanted to thank ALL of you again for all the hard work getting us through the holiday crunch. Upper management thought we did a really good job! I’ll put in a good word for all of you come reviews.",
       "canReply": true,
       "requiresReply": false
     },
     "coop_003": {
       "id": "coop_003",
-      "from": "Department Head",
-      "subject": "TODO: Cooperative cue email 3",
-      "body": "TODO: Add content emphasizing cooperation",
+      "from": "Sarah Chen (Manager)",
+      "subject": "Little Celebration in the Pantry",
+      "body": "Thought I’d put together a little informal awards ceremony to celebrate everything we’d achieved together last year. Got us two boxes of donuts, and every donut has our team's name on it!",
       "canReply": true,
       "requiresReply": false
     },
-    "coop_004": {
-      "id": "coop_004",
-      "from": "HR",
-      "subject": "TODO: Cooperative cue email 4",
-      "body": "TODO: Add content emphasizing cooperation",
-      "canReply": true,
-      "requiresReply": false
-    },
+"coop_004": {
+  "id": "coop_004",
+  "from": "Sarah Chen (Manager)",
+  "subject": "Re: Bug Documentation Question",
+  "body": "<p><strong>From:</strong> You | <strong>To:</strong> Sarah Chen<br>Hey boss, I've been working on the bug you assigned me earlier. It's a little hard to figure out what the original code was doing because the documentation isn't very clear. Do you know who worked on it originally?</p><p>---</p><p><strong>From:</strong> Sarah Chen | <strong>To:</strong> You, Taylor Kim<br>Sure, Taylor worked on this. CC'd them here.</p><p>---</p><p><strong>From:</strong> You | <strong>To:</strong> Taylor Kim, Sarah Chen<br>Thanks, boss! Hey Taylor, noticed that the documentation for this code is a little vague. Could you walk me through what this part intended to do?</p><p>---</p><p><strong>From:</strong> Taylor Kim | <strong>To:</strong> You, Sarah Chen<br>Oh, yes. Let's deal with that asap. I can come over to walk you through it later in the afternoon.</p><p>---</p><p><strong>From:</strong> Sarah Chen | <strong>To:</strong> You, Taylor Kim<br>Yes, let's make sure everyone's on board. Please CC everyone else who's working on this code. Thank you for sharing the info so quickly!</p>",
+  "canReply": true,
+  "requiresReply": false
+},
     
     "comp_001": {
       "id": "comp_001",
-      "from": "Manager",
-      "subject": "TODO: Competitive cue email 1",
-      "body": "TODO: Add content emphasizing competition",
+      "from": "Chris Schafer (Head of HR)",
+      "subject": "Performance Reminders",
+      "body": "As we begin the new year, we are excited to launch the new year’s performance cycle. <br><br>Our philosophy is simple. We achieve excellence through competition. As a result, the performance evaluation process is rank-based. Performance reviews will be conducted individually—how well you perform relative to key performance indicators set for you at the beginning of every financial quarter. At the end of each quarter, managers rank employees against their peers. This helps us identify and reward high-achieving employees. Management will soon meet to discuss goal-setting for this quarter. <br><br>We look forward to celebrating another great year at Optimo.",
       "canReply": true,
       "requiresReply": false
     },
     "comp_002": {
       "id": "comp_002",
-      "from": "Executive",
-      "subject": "TODO: Competitive cue email 2",
-      "body": "TODO: Add content emphasizing competition",
+      "from": "Sarah Chen (Manager)",
+      "subject": "Distinguished Employee Award Nominations",
+      "body": "It’s that time of the year again! We’re seeking nominations for the company's annual Distinguished Employee Award. If you think you went above and beyond at work last year, send me a document outlining all your accomplishments from last year. Thank you!",
       "canReply": true,
       "requiresReply": false
     },
     "comp_003": {
       "id": "comp_003",
-      "from": "Team Lead",
-      "subject": "TODO: Competitive cue email 3",
-      "body": "TODO: Add content emphasizing competition",
+      "from": "Chris Schafer (Head of HR)",
+      "subject": "Announcing the Leadership Fast-Track Program!",
+      "body": "We are pleased to announce the launch of our Leadership Fast-Track Program, an exclusive opportunity for our top 5% of performers. This intensive program is designed to accelerate the careers of our most promising individuals. Managers will be nominating high-achievers for a limited number of slots.",
       "canReply": true,
       "requiresReply": false
     },
     "comp_004": {
       "id": "comp_004",
-      "from": "Department Head",
-      "subject": "TODO: Competitive cue email 4",
-      "body": "TODO: Add content emphasizing competition",
+      "from": "Chris Schafer (Head of HR)",
+      "subject": "NOTICE: Access to Optimo Executive Lounge",
+      "body": "Please be reminded that our executive lounge is only open to <strong>Optimo Distinguished Employees</strong>, i.e., those who ranked in the top 5% of employees in the last cycle. Please do not bring guests or allow others to enter.",
       "canReply": true,
       "requiresReply": false
     },

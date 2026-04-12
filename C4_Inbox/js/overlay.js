@@ -108,38 +108,245 @@ class Overlay {
     /**
      * Load wellness exercise (paradox mindset manipulation)
      */
-    loadWellnessExercise(data) {
-        this.bodyElement.innerHTML = `
-            <h2>Wellness Exercise</h2>
-            <p>Take a few moments to reflect on the following prompts. Your responses will help us understand your perspective.</p>
-            
-            <div class="wellness-form">
-                <div class="wellness-prompt">
-                    <label>Prompt 1: Think about a time when you experienced both positive and negative aspects of a situation simultaneously.</label>
-                    <textarea id="wellness-prompt-1" rows="4" placeholder="Type your response here..."></textarea>
-                </div>
-                
-                <div class="wellness-prompt">
-                    <label>Prompt 2: How do you typically handle situations where there are conflicting demands or contradictory information?</label>
-                    <textarea id="wellness-prompt-2" rows="4" placeholder="Type your response here..."></textarea>
-                </div>
-                
-                <div class="wellness-prompt">
-                    <label>Prompt 3: Describe a recent work situation where you had to balance competing priorities.</label>
-                    <textarea id="wellness-prompt-3" rows="4" placeholder="Type your response here..."></textarea>
-                </div>
-            </div>
-            
-            <button id="wellness-submit" class="submit-btn">Complete Exercise</button>
-        `;
-        
-        // Hide close button (required to complete)
-        this.closeButton.style.display = 'none';
-        
-        // Add submit handler
-        const submitBtn = document.getElementById('wellness-submit');
-        submitBtn.addEventListener('click', () => this.submitWellnessExercise());
+/**
+ * Load wellness exercise (3 pages: pre-test, manipulation, post-test)
+ */
+loadWellnessExercise(data) {
+    // Determine condition (paradox vs control)
+    const isParadox = this.experiment.state.mindset === 'paradox';
+    
+    // Store wellness data
+    this.wellnessData = {
+        condition: this.experiment.state.mindset,
+        page: 1,
+        experiencingTensions: {},
+        manipulationResponse: '',
+        paradoxMindset: {},
+        startTime: Date.now()
+    };
+    
+    // Randomize scale items
+    this.experiencingTensionsItems = this.shuffleArray([
+        { id: 'et_1', text: 'I have competing demands that need to be addressed at the same time.' },
+        { id: 'et_2', text: 'I sometimes hold two ideas in mind that seem contradictory when appearing together.' },
+        { id: 'et_3', text: 'I have goals that contradict each other.' },
+        { id: 'et_4', text: 'I have to meet contradictory requirements.' },
+        { id: 'et_5', text: 'When I examine a problem, the possible solutions seem contradictory.' },
+        { id: 'et_6', text: 'I need to decide between opposing alternatives.' },
+        { id: 'et_7', text: 'Work is filled with tensions and contradictions.' }
+    ]);
+    
+    this.paradoxMindsetItems = this.shuffleArray([
+        { id: 'pm_1', text: 'When I consider conflicting perspectives, I gain a better understanding of an issue.' },
+        { id: 'pm_2', text: 'I am comfortable dealing with conflicting demands at the same time.' },
+        { id: 'pm_3', text: 'Accepting contradictions is essential for my success.' },
+        { id: 'pm_4', text: 'Tension between ideas energizes me.' },
+        { id: 'pm_5', text: 'I enjoy it when I manage to pursue contradictory goals.' },
+        { id: 'pm_6', text: 'I experience myself as simultaneously embracing conflicting demands.' },
+        { id: 'pm_7', text: 'I am comfortable working on tasks that contradict each other.' },
+        { id: 'pm_8', text: 'I feel uplifted when I realize that two opposites can be true.' },
+        { id: 'pm_9', text: 'I feel energized when I manage to address contradictory issues.' }
+    ]);
+    
+    // Show first page
+    this.showWellnessPage1();
+}
+
+/**
+ * Shuffle array helper
+ */
+shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
+    return shuffled;
+}
+
+/**
+ * Page 1: Experiencing Tensions Scale
+ */
+showWellnessPage1() {
+    this.bodyElement.innerHTML = `
+        <h2>Wellness Exercise - Part 1 of 3</h2>
+        <p style="margin-bottom: 20px;">Think about what you think it's like working at Optimo when you answer the following questions.</p>
+        
+        <form id="wellness-page1-form">
+            ${this.experiencingTensionsItems.map(item => `
+                <div class="wellness-scale-item">
+                    <p style="font-weight: 600; margin-bottom: 10px;">${item.text}</p>
+                    <div class="likert-scale">
+                        <label class="likert-label-start">Strongly disagree</label>
+                        <div class="likert-options">
+                            ${[1, 2, 3, 4, 5, 6, 7].map(val => `
+                                <label class="likert-option">
+                                    <input type="radio" name="${item.id}" value="${val}" required>
+                                    <span>${val}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                        <label class="likert-label-end">Strongly agree</label>
+                    </div>
+                </div>
+            `).join('')}
+            
+            <button type="submit" class="submit-btn" style="margin-top: 30px;">Continue</button>
+        </form>
+    `;
+    
+    // Hide close button
+    this.closeButton.style.display = 'none';
+    
+    // Handle form submission
+    document.getElementById('wellness-page1-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.submitWellnessPage1();
+    });
+}
+
+/**
+ * Submit Page 1 and move to Page 2
+ */
+submitWellnessPage1() {
+    const formData = new FormData(document.getElementById('wellness-page1-form'));
+    
+    // Collect responses
+    this.experiencingTensionsItems.forEach(item => {
+        this.wellnessData.experiencingTensions[item.id] = parseInt(formData.get(item.id));
+    });
+    
+    console.log('Experiencing tensions responses:', this.wellnessData.experiencingTensions);
+    
+    // Move to page 2
+    this.wellnessData.page = 2;
+    this.showWellnessPage2();
+}
+
+/**
+ * Page 2: Paradox Mindset Manipulation
+ */
+showWellnessPage2() {
+    const isParadox = this.experiment.state.mindset === 'paradox';
+    
+    // Placeholder prompts for both conditions
+    const prompt = isParadox 
+        ? "In today’s rapidly changing and volatile business environment, employees are increasingly confronted with paradoxical tensions. These tensions stem from competing demands, diverse values, and contrasting perspectives, often turning decision-making into a constant tug-of-war. For example, how can we develop new skills while honing existing skills? How can we be flexible while also complying with company policies? How can we be a good team player while striving to be the best? <br><br> Such tensions can feel paralyzing, but they don’t have to be. In fact, embracing these tensions and contradictions is beneficial. Instead of thinking of whether to do one or the other, thinking of how one can do both helps people generate innovative solutions that help them navigate these tensions. <br><br>Here at Optimo, we’re certain that employees face similar types of tensions, but we want to help you manage them. Think about some of the tensions you might’ve experienced here at Optimo. They could be mixed signals from your coworkers or supervisors about what you should do, whether you should compete against or cooperate with one another, and so on. Then, think carefully about how these things in tension might actually complement each other. For instance, how can you both be a team player and strive to be better than those around you without compromising on either? <br><br>Please write 2 to 3 sentences about some tensions you experience at Optimo and how you can deal with them."
+        : "In today’s rapidly changing and volatile business environment, employees are increasingly confronted with paradoxical tensions. These tensions stem from competing demands, diverse values, and contrasting perspectives, often turning decision-making into a constant tug-of-war. For example, how can we develop new skills while honing existing skills? How can we be flexible while also complying with company policies? How can we be a good team player while striving to be the best? <br><br>Such tensions can feel paralyzing, but they don’t have to be. In fact, prioritizing certain elements that seem to contradict or be in tension with other elements is beneficial. Choosing whether to do one or the other helps people navigate these tensions. <br><br>Here at Optimo, we’re certain that employees face similar types of tensions, but we want to help you manage them. Think about some of the tensions you might’ve experienced here at Optimo. They could be mixed signals from your coworkers or supervisors about what you should do, whether you should compete against or cooperate with one another, and so on. Then, think carefully about what you would prioritize among these things in tension. For instance, should you be more of a team player or strive to be better than those around you?<br><br>Please write 2 to 3 sentences about some tensions you experience at Optimo and how you can deal with them.";
+    
+    this.bodyElement.innerHTML = `
+        <h2>Wellness Exercise - Part 2 of 3</h2>
+        <p style="margin-bottom: 20px;">${prompt}</p>
+        
+        <form id="wellness-page2-form">
+            <textarea id="wellness-manipulation-response" 
+                      rows="8" 
+                      placeholder="Type your response here..." 
+                      required
+                      style="width: 100%; padding: 12px; border: 2px solid #bdc3c7; border-radius: 6px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; resize: vertical;"></textarea>
+            
+            <button type="submit" class="submit-btn" style="margin-top: 20px;">Continue</button>
+        </form>
+    `;
+    
+    // Handle form submission
+    document.getElementById('wellness-page2-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.submitWellnessPage2();
+    });
+}
+
+/**
+ * Submit Page 2 and move to Page 3
+ */
+submitWellnessPage2() {
+    const response = document.getElementById('wellness-manipulation-response').value.trim();
+    
+    if (!response) {
+        alert('Please enter a response before continuing.');
+        return;
+    }
+    
+    this.wellnessData.manipulationResponse = response;
+    console.log('Manipulation response recorded');
+    
+    // Move to page 3
+    this.wellnessData.page = 3;
+    this.showWellnessPage3();
+}
+
+/**
+ * Page 3: Paradox Mindset Scale
+ */
+showWellnessPage3() {
+    this.bodyElement.innerHTML = `
+        <h2>Wellness Exercise - Part 3 of 3</h2>
+        <p style="margin-bottom: 20px;">After completing the exercise on the previous page, how much do you agree with the following statements?</p>
+        
+        <form id="wellness-page3-form">
+            ${this.paradoxMindsetItems.map(item => `
+                <div class="wellness-scale-item">
+                    <p style="font-weight: 600; margin-bottom: 10px;">${item.text}</p>
+                    <div class="likert-scale">
+                        <label class="likert-label-start">Strongly disagree</label>
+                        <div class="likert-options">
+                            ${[1, 2, 3, 4, 5, 6, 7].map(val => `
+                                <label class="likert-option">
+                                    <input type="radio" name="${item.id}" value="${val}" required>
+                                    <span>${val}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                        <label class="likert-label-end">Strongly agree</label>
+                    </div>
+                </div>
+            `).join('')}
+            
+            <button type="submit" class="submit-btn" style="margin-top: 30px;">Complete Exercise</button>
+        </form>
+    `;
+    
+    // Handle form submission
+    document.getElementById('wellness-page3-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.submitWellnessPage3();
+    });
+}
+
+/**
+ * Submit Page 3 and complete wellness exercise
+ */
+submitWellnessPage3() {
+    const formData = new FormData(document.getElementById('wellness-page3-form'));
+    
+    // Collect responses
+    this.paradoxMindsetItems.forEach(item => {
+        this.wellnessData.paradoxMindset[item.id] = parseInt(formData.get(item.id));
+    });
+    
+    // Record completion time
+    this.wellnessData.completionTime = Date.now();
+    this.wellnessData.totalTime = this.wellnessData.completionTime - this.wellnessData.startTime;
+    
+    console.log('Wellness exercise completed:', this.wellnessData);
+    
+    // Save to experiment data
+    if (this.experiment.data) {
+        this.experiment.data.tutorial = this.experiment.data.tutorial || {};
+        this.experiment.data.tutorial.wellnessExercise = this.wellnessData;
+    }
+    
+    // Track event
+    if (this.experiment.tracker && this.experiment.tracker.isTracking) {
+        this.experiment.tracker.logEvent('wellness_completed', {
+            condition: this.wellnessData.condition,
+            totalTime: this.wellnessData.totalTime
+        });
+    }
+    
+    // Close overlay
+    this.hide();
+}
 
     /**
      * Submit wellness exercise
@@ -186,36 +393,39 @@ class Overlay {
     /**
      * Load video player
      */
-    loadVideo(data) {
-        if (!data.videoUrl) {
-            console.error('No video URL provided');
-            return;
-        }
-        
-        this.bodyElement.innerHTML = `
-            <video id="overlay-video" controls autoplay style="width: 100%; max-width: 800px;">
-                <source src="${data.videoUrl}" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        `;
-        
-        // Hide close button (must watch)
-        this.closeButton.style.display = 'none';
-        
-        // Auto-close when video ends
-        const video = document.getElementById('overlay-video');
-        video.addEventListener('ended', () => {
-            console.log('Video ended');
-            this.hide();
-        });
-        
-        // Track video start
-        if (this.experiment.tracker && this.experiment.tracker.isTracking) {
-            this.experiment.tracker.logEvent('video_started', {
-                videoUrl: data.videoUrl
-            });
-        }
+/**
+ * Load video player
+ */
+loadVideo(data) {
+    if (!data.videoUrl) {
+        console.error('No video URL provided');
+        return;
     }
+    
+    this.bodyElement.innerHTML = `
+        <video id="overlay-video" controls autoplay style="width: 100%; max-width: 800px;">
+            <source src="${data.videoUrl}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    `;
+    
+    // Hide close button (must watch)
+    this.closeButton.style.display = 'none';
+    
+    // Auto-close when video ends
+    const video = document.getElementById('overlay-video');
+    video.addEventListener('ended', () => {
+        console.log('Video ended');
+        this.hide();
+    });
+    
+    // Track video start
+    if (this.experiment.tracker && this.experiment.tracker.isTracking) {
+        this.experiment.tracker.logEvent('video_started', {
+            videoUrl: data.videoUrl
+        });
+    }
+}
 
     /**
  /**

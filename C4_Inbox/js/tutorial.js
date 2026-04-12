@@ -54,7 +54,7 @@ constructor(experiment) {
         const steps = [
             {
                 id: 'welcome',
-                message: 'Welcome to your first day at Optimo! Let me show you around your workspace.',
+                message: 'Welcome back to Optimo from the holidays! Let me show you around your workspace.',
                 highlight: null,
                 action: 'click_next'
             },
@@ -569,12 +569,18 @@ practiceCompleted() {
         return this.gameTimeComplete || false;
     }
 
-    triggerBossVideo() {
-        if (this.experiment.overlay) {
-            alert('Boss arrival video would play here. For testing, we will skip it.');
+triggerBossVideo() {
+    if (this.experiment.overlay) {
+        // Show video in overlay
+        this.experiment.overlay.show('video', {
+            videoUrl: 'images/intro/StartWork.mp4'
+        }, () => {
+            // After video ends, show alert then advance
+            alert('Oh! Looks like your manager is here. Time to start work!');
             this.forceAdvance();
-        }
+        });
     }
+}
 
     enableWorkButton() {
         const workBtn = document.getElementById('work-btn');

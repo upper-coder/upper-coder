@@ -300,8 +300,7 @@ this.emailStates[emailId] = {
             <div class="email-full-header">
                 <div class="email-full-from">From: ${email.from}</div>
                 <div class="email-full-subject">${email.subject}</div>
-                <div class="email-full-time">Just now</div>
-            </div>
+                </div>
             <div class="email-full-body">${email.body}</div>
             ${email.hasButton ? `
                 <button class="email-action-btn" data-action="${email.buttonAction}">

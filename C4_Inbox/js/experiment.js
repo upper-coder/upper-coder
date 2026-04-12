@@ -97,33 +97,51 @@ class Experiment {
      * Start experiment after consent (and intro pages when implemented)
      * Called by consent form or intro pages
      */
-    async startAfterConsent() {
-        console.log('Starting experiment after consent...');
-        
-        this.state.phase = 'TUTORIAL';
-        
-        // Initialize all experiment components
-        await this.initializeExperimentComponents();
-        
-        // Load emails for this condition
-        const emailsLoaded = await this.emailSystem.loadEmails(this.state.condition);
-        
-        if (!emailsLoaded) {
-            console.error('Failed to load emails');
-            alert('Error loading experiment content. Please refresh and try again.');
-            return;
-        }
-        
-        // Deliver initial emails to inbox
-        this.emailSystem.deliverInitialEmails();
-        
-        // Start tutorial after brief delay
-        setTimeout(() => {
-            this.startTutorial();
-        }, 1000);
-        
-        console.log('✓ Experiment started');
+/**
+ * Start experiment after consent
+ * Called by consent form
+ */
+async startAfterConsent() {
+    console.log('Starting intro pages...');
+    
+    // Initialize intro pages
+    this.introPages = new IntroPages(this);
+    
+    // Show intro pages
+    this.introPages.start();
+}
+
+/**
+ * Start experiment after intro pages
+ * Called by intro pages
+ */
+async startAfterIntro() {
+    console.log('Starting experiment after intro pages...');
+    
+    this.state.phase = 'TUTORIAL';
+    
+    // Initialize all experiment components
+    await this.initializeExperimentComponents();
+    
+    // Load emails for this condition
+    const emailsLoaded = await this.emailSystem.loadEmails(this.state.condition);
+    
+    if (!emailsLoaded) {
+        console.error('Failed to load emails');
+        alert('Error loading experiment content. Please refresh and try again.');
+        return;
     }
+    
+    // Deliver initial emails to inbox
+    this.emailSystem.deliverInitialEmails();
+    
+    // Start tutorial after brief delay
+    setTimeout(() => {
+        this.startTutorial();
+    }, 1000);
+    
+    console.log('✓ Experiment started');
+}
 
     /**
      * Initialize all experiment components (after consent)

@@ -58,6 +58,7 @@ body {
     flex: 1;
     display: flex;
     overflow: hidden;
+    min-height: 0; /* ADD THIS */
 }
 
 /* Sidebar */
@@ -127,20 +128,24 @@ body {
     font-weight: 600;
 }
 
-/* Main Content Area */
+/* Force main content to respect boundaries */
 #main-content {
     flex: 1;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    min-height: 0; /* ADD THIS */
 }
 
+/* Force content panel */
 .content-panel {
     flex: 1;
     display: flex;
     flex-direction: column;
     background-color: #ffffff;
     overflow: hidden;
+    min-height: 0;
+    max-height: 100%; /* ADD THIS */
 }
 
 .content-header {
@@ -173,10 +178,9 @@ body {
     opacity: 0.7;
 }
 
-/* Email List Styles */
 #email-list {
     flex: 1;
-    overflow-y: auto;
+    overflow: hidden; /* CHANGE from overflow-y: auto */
     display: flex;
     flex-direction: column;
     gap: 1px;
@@ -185,22 +189,21 @@ body {
 
 .email-item {
     background-color: #ffffff;
-    padding: 15px 20px;
+    padding: 8px 15px; /* Reduced padding */
     cursor: pointer;
     transition: background-color 0.2s ease;
     position: relative;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-rows: auto auto auto;
-    gap: 4px;
+    display: flex; /* CHANGE from grid to flex */
+    align-items: center; /* Vertically center content */
+    gap: 15px; /* Space between elements */
 }
 
 .email-item:hover {
     background-color: #f8f9fa;
 }
 
-.email-item.unread {
-    background-color: #f0f8ff;
+.email-item.unread .email-sender {
+    font-weight: 700;
 }
 
 .email-item.unread:hover {
@@ -208,11 +211,11 @@ body {
 }
 
 .email-sender {
-    grid-column: 1;
-    grid-row: 1;
     font-weight: 600;
     color: #2c3e50;
-    font-size: 14px;
+    font-size: 13px;
+    min-width: 150px; /* Fixed width for sender */
+    flex-shrink: 0; /* Don't let it shrink */
 }
 
 .email-item.unread .email-sender {
@@ -220,39 +223,29 @@ body {
 }
 
 .email-time {
-    grid-column: 2;
-    grid-row: 1;
-    font-size: 12px;
+    font-size: 11px;
     color: #7f8c8d;
     text-align: right;
-    padding-left: 15px;
+    min-width: 70px; /* Fixed width for time */
+    flex-shrink: 0;
 }
 
 .email-subject {
-    grid-column: 1 / -1;
-    grid-row: 2;
+    flex: 1; /* Take remaining space */
     color: #34495e;
-    font-size: 13px;
-    margin-top: 2px;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; /* Single line */
 }
 
 .email-item.unread .email-subject {
     font-weight: 600;
 }
 
+/* Remove preview completely */
 .email-preview {
-    grid-column: 1 / -1;
-    grid-row: 3;
-    color: #7f8c8d;
-    font-size: 12px;
-    line-height: 1.4;
-    margin-top: 4px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2; /* Standard property for compatibility */
-    -webkit-box-orient: vertical;
+    display: none;
 }
 
 /* Bottom Navigation */
@@ -391,6 +384,7 @@ body {
     pointer-events: none;
 }
 
+/* Tutorial overlay - make it NOT block pointer events on highlighted areas */
 .tutorial-overlay {
     position: absolute;
     top: 0;
@@ -398,16 +392,18 @@ body {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.85);
-    pointer-events: auto; /* Changed - blocks clicks on grey areas */
+    pointer-events: none; /* CHANGE - let events pass through */
     cursor: not-allowed;
 }
 
 .tutorial-highlighted {
     position: relative;
     z-index: 8889;
-    box-shadow: 0 0 0 4px #3498db, 0 0 0 9999px rgba(0, 0, 0, 0.85);
-    pointer-events: auto;
-    cursor: pointer;
+    outline: 4px solid #3498db; /* Use outline instead of box-shadow */
+    outline-offset: 0px;
+    pointer-events: auto !important;
+    cursor: default;
+    overflow-y: auto !important; /* Force scrolling */
 }
 
 /* Disable interaction until Next is clicked */
@@ -804,16 +800,14 @@ body {
     margin-bottom: 10px;
 }
 
-.email-full-time {
-    font-size: 13px;
-    color: #7f8c8d;
-}
 
 .email-full-body {
     font-size: 14px;
     line-height: 1.6;
     color: #2c3e50;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
+    max-height: 350px; /* ADD - limit height */
+    overflow-y: auto; /* ADD - make scrollable */
 }
 
 .email-reply-box {
@@ -829,12 +823,14 @@ body {
 
 .email-reply-box textarea {
     width: 100%;
-    min-height: 120px;
-    padding: 12px;
+    min-height: 50px; /* About 2 lines of text */
+    max-height: 150px; /* Allow expansion but not too much */
+    padding: 8px 12px; /* Slightly reduced padding */
     border: 2px solid #bdc3c7;
     border-radius: 6px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 14px;
+    line-height: 1.4;
     resize: vertical;
     margin-bottom: 10px;
 }
@@ -974,10 +970,10 @@ body {
 }
 
 .email-viewer {
-    padding: 30px;
+    padding: 10px 30px 30px 30px; /* Just 10px at the top */
     background-color: white;
     overflow-y: auto;
-    display: none; /* Hidden by default */
+    display: none;
 }
 
 /* Email action button */
@@ -1257,4 +1253,96 @@ body {
     font-size: 15px;
     font-weight: 600;
     color: #27ae60;
+}
+
+/* Pagination controls */
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 10px;
+    background-color: #ecf0f1;
+    border-top: 1px solid #bdc3c7;
+}
+
+.page-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.page-btn:hover:not(:disabled) {
+    background-color: #2980b9;
+}
+
+.page-btn:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.page-info {
+    font-size: 14px;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+/* Wellness scale items */
+.wellness-scale-item {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.wellness-scale-item:last-child {
+    border-bottom: none;
+}
+
+.likert-scale {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.likert-label-start,
+.likert-label-end {
+    font-size: 12px;
+    color: #7f8c8d;
+    min-width: 100px;
+}
+
+.likert-label-start {
+    text-align: right;
+}
+
+.likert-options {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+    justify-content: center;
+}
+
+.likert-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+}
+
+.likert-option input[type="radio"] {
+    margin-bottom: 4px;
+    cursor: pointer;
+}
+
+.likert-option span {
+    font-size: 12px;
+    font-weight: 600;
+    color: #34495e;
 }
