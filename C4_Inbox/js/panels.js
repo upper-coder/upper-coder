@@ -60,23 +60,24 @@ class PanelManager {
     }
 
 createGamePanel() {
-        const gamePanel = document.createElement('div');
-        gamePanel.id = 'game-content';
-        gamePanel.className = 'content-panel hidden';
-        gamePanel.innerHTML = `
-            <div class="content-header">
-                <h2>Break Room</h2>
+    const gamePanel = document.createElement('div');
+    gamePanel.id = 'game-content';
+    gamePanel.className = 'content-panel hidden';
+    gamePanel.innerHTML = `
+        <div class="content-header">
+            <h2>Break Room</h2>
+        </div>
+        <div id="game-area" class="game-area">
+            <div class="game-container">
+                <button id="close-game-btn" class="close-game-btn">✕ Close Game</button>
+                <h3>Snake Game</h3>
+                <p>Use arrow keys to move. Press any arrow key to start.</p>
+                <canvas id="snake-canvas" width="300" height="300"></canvas>
+                <!-- CHANGED from width="400" height="400" -->
+                <div class="game-score">Score: <span id="game-score">0</span></div>
             </div>
-            <div id="game-area" class="game-area">
-                <div class="game-container">
-                    <button id="close-game-btn" class="close-game-btn">✕ Close Game</button>
-                    <h3>Snake Game</h3>
-                    <p>Use arrow keys to move. Press any arrow key to start.</p>
-                    <canvas id="snake-canvas" width="400" height="400"></canvas>
-                    <div class="game-score">Score: <span id="game-score">0</span></div>
-                </div>
-            </div>
-        `;
+        </div>
+    `;
         
         const mainContent = document.getElementById('main-content');
         mainContent.appendChild(gamePanel);
@@ -209,24 +210,26 @@ initializeWorkPanel() {
      * Load Snake game (simple implementation)
      */
     loadGame() {
-        const canvas = document.getElementById('snake-canvas');
-        if (!canvas) {
-            console.error('Canvas not found');
-            return;
-        }
-        
-        const ctx = canvas.getContext('2d');
-        
-        // Simple Snake game variables
-        let snake = [{x: 200, y: 200}];
-        let direction = {x: 0, y: 0};
-        let food = {x: 0, y: 0};
-        let score = 0;
-        let gameRunning = false;
-        let gameInterval = null;
-        
-        const gridSize = 20;
-        const tileCount = canvas.width / gridSize;
+    const canvas = document.getElementById('snake-canvas');
+    if (!canvas) {
+        console.error('Canvas not found');
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Simple Snake game variables
+    let snake = [{x: 150, y: 150}];  // CHANGED from 200, 200
+    let direction = {x: 0, y: 0};
+    let food = {x: 0, y: 0};
+    let score = 0;
+    let gameRunning = false;
+    let gameInterval = null;
+    
+    const gridSize = 15;  // CHANGED from 20
+    const tileCount = canvas.width / gridSize;
+    
+    // ... rest stays the same
         
         // Place food randomly
         const placeFood = () => {
@@ -316,9 +319,9 @@ initializeWorkPanel() {
         
         // Reset game state
         const resetGame = () => {
-            snake = [{x: 200, y: 200}];
-            direction = {x: 0, y: 0};
-            score = 0;
+            snake = [{x: 150, y: 150}];  // CHANGED from 200, 200
+    direction = {x: 0, y: 0};
+    score = 0;
             document.getElementById('game-score').textContent = score;
             gameRunning = false;
             if (gameInterval) {

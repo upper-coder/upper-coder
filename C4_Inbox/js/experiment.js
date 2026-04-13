@@ -309,8 +309,8 @@ async startAfterIntro() {
         }
         
         // Random times between 5 and 15 minutes (in real time)
-        const minDelay = 5 * 60 * 1000; // 5 minutes
-        const maxDelay = 15 * 60 * 1000; // 15 minutes
+        const minDelay = 2 * 60 * 1000; // 2 minutes
+        const maxDelay = 5 * 60 * 1000; // 5 minutes
         
         // Random delay for prosocial email
         const prosocialDelay = Math.random() * (maxDelay - minDelay) + minDelay;

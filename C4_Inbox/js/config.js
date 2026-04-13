@@ -8,7 +8,7 @@ const CONFIG = {
     // ============================================
     // TIMING PARAMETERS
     // ============================================
-    REAL_DURATION_MINUTES: 20,
+    REAL_DURATION_MINUTES: 10,
     SIM_START_HOUR: 8,
     SIM_START_MINUTE: 45,
     SIM_END_HOUR: 17,
@@ -28,8 +28,8 @@ const CONFIG = {
     // CRITICAL EMAIL TIMING
     // ============================================
     CRITICAL_EMAIL_WINDOW: {
-        minMinute: 5,    // earliest real minute
-        maxMinute: 15    // latest real minute
+        minMinute: 2,    // earliest real minute
+        maxMinute: 5    // latest real minute
     },
 
     // ============================================

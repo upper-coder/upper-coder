@@ -166,14 +166,14 @@ steps.push({
                 checkInterval: 500
             },
 {
-                id: 'game_play',
-                message: 'Feel free to play for a moment, or click "Close Game" to continue. The workday will start soon...',
-                highlight: ['#game-area'],
-                action: 'wait_for_game_done',
-                onEnter: () => this.waitForGameTime(),
-                validation: () => this.gameTimeDone(),
-                checkInterval: 500
-            },
+    id: 'game_play',
+    message: 'Feel free to play for a moment, or click "Close Game" to continue. The workday will start soon...',
+    highlight: ['#game-area', '.close-game-btn'], // ADD close button to highlights
+    action: 'wait_for_game_done',
+    onEnter: () => this.waitForGameTime(),
+    validation: () => this.gameTimeDone(),
+    checkInterval: 500
+},
  {
                 id: 'boss_arrives',
                 message: 'It\'s 9:00 AM - your manager has arrived!',
@@ -184,6 +184,11 @@ steps.push({
                     if (this.gameTimer) clearTimeout(this.gameTimer);
                     if (this.gameCheckInterval) clearInterval(this.gameCheckInterval);
                     
+        // Pause clock BEFORE jumping and playing video
+        if (this.experiment.clock && this.experiment.clock.isRunning) {
+            this.experiment.clock.pause();
+        }
+
                     // Jump to 9am
                     if (this.experiment.clock) {
                         this.experiment.clock.jumpTo(9, 0);
@@ -201,7 +206,13 @@ steps.push({
                 message: 'Time to start work. At Optimo, your task is to plan optimal delivery routes for our clients. Click the Work button to begin!',
                 highlight: ['#work-btn'],
                 action: 'open_work',
-                onEnter: () => this.enableWorkButton(),
+                onEnter: () => {
+        // Make sure clock is still paused
+        if (this.experiment.clock && this.experiment.clock.isRunning && !this.experiment.clock.isPaused) {
+            this.experiment.clock.pause();
+        }
+        this.enableWorkButton();
+    },
                 validation: () => this.workOpened(),
                 checkInterval: 500
             },
@@ -547,23 +558,44 @@ practiceCompleted() {
         }, 5000);
     }
 
-    waitForGameTime() {
-        this.gameStartTime = Date.now();
-        this.gameTimeComplete = false;
-        
-        this.gameTimer = setTimeout(() => {
-            this.gameTimeComplete = true;
-        }, 30000);
-        
-        this.gameCheckInterval = setInterval(() => {
-            if (this.experiment.panelManager && 
-                this.experiment.panelManager.getCurrentPanel() !== 'game') {
-                this.gameTimeComplete = true;
-                if (this.gameTimer) clearTimeout(this.gameTimer);
-                if (this.gameCheckInterval) clearInterval(this.gameCheckInterval);
-            }
-        }, 500);
+waitForGameTime() {
+    this.gameStartTime = Date.now();
+    this.gameTimeComplete = false;
+    
+    // Resume clock during game
+    if (this.experiment.clock && this.experiment.clock.isPaused) {
+        this.experiment.clock.resume();
     }
+    
+    // Watch for 9:00 AM
+    this.nineAmWatcher = setInterval(() => {
+        const currentTime = this.experiment.clock.getCurrentSimTime();
+        
+        // When clock hits 9:00 AM or later, trigger completion
+        if (currentTime.hours >= 9 && currentTime.minutes >= 0) {
+            console.log('9:00 AM reached at', currentTime);
+            this.gameTimeComplete = true;
+            
+            // Clean up
+            clearInterval(this.nineAmWatcher);
+            if (this.gameCheckInterval) clearInterval(this.gameCheckInterval);
+            
+            // Pause clock
+            this.experiment.clock.pause();
+        }
+    }, 100);
+    
+    // Also check if they close the game manually
+    this.gameCheckInterval = setInterval(() => {
+        if (this.experiment.panelManager && 
+            this.experiment.panelManager.getCurrentPanel() !== 'game') {
+            this.gameTimeComplete = true;
+            
+            if (this.nineAmWatcher) clearInterval(this.nineAmWatcher);
+            if (this.gameCheckInterval) clearInterval(this.gameCheckInterval);
+        }
+    }, 500);
+}
 
     gameTimeDone() {
         return this.gameTimeComplete || false;
@@ -571,10 +603,14 @@ practiceCompleted() {
 
 triggerBossVideo() {
     if (this.experiment.overlay) {
-        // Show video in overlay
         this.experiment.overlay.show('video', {
             videoUrl: 'images/intro/StartWork.mp4'
         }, () => {
+            // PAUSE clock before showing alert
+            if (this.experiment.clock && this.experiment.clock.isRunning && !this.experiment.clock.isPaused) {
+                this.experiment.clock.pause();
+            }
+            
             // After video ends, show alert then advance
             alert('Oh! Looks like your manager is here. Time to start work!');
             this.forceAdvance();
