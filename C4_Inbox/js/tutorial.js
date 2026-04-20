@@ -168,9 +168,29 @@ steps.push({
 {
     id: 'game_play',
     message: 'Feel free to play for a moment, or click "Close Game" to continue. The workday will start soon...',
-    highlight: ['#game-area', '.close-game-btn'], // ADD close button to highlights
+    highlight: ['#game-area'], // Just highlight the whole game area
     action: 'wait_for_game_done',
-    onEnter: () => this.waitForGameTime(),
+    onEnter: () => {
+        // PAUSE the clock during game tutorial
+        if (this.experiment.clock && this.experiment.clock.isRunning) {
+            this.experiment.clock.pause();
+        }
+        
+        this.gameStartTime = Date.now();
+        this.gameTimeComplete = false;
+        
+        this.gameTimer = setTimeout(() => {
+            this.gameTimeComplete = true;
+        }, 18000);
+        
+        this.gameCheckInterval = setInterval(() => {
+            if (this.experiment.panelManager && 
+                this.experiment.panelManager.getCurrentPanel() !== 'game') {
+                this.gameTimeComplete = true;
+                if (this.gameTimer) clearTimeout(this.gameTimer);
+            }
+        }, 500);
+    },
     validation: () => this.gameTimeDone(),
     checkInterval: 500
 },
@@ -267,41 +287,52 @@ steps.push({
             },
 {
     id: 'tutorial_complete',
-    message: 'Tutorial complete! You have until 5:00 PM Click "Next" when you\'re ready to begin.',
+    message: '<h2 style="margin-bottom: 20px; color: #2c3e50;">Tutorial Complete!</h2><p style="margin-bottom: 15px;">You have until <strong>5:00 PM</strong> to complete your workday.</p><p style="margin-bottom: 15px;"><strong>Your goal:</strong> Complete as many delivery route tasks as efficiently as possible.</p><p style="margin-bottom: 15px;"><strong>Your bonus will be based on:</strong></p><ul style="text-align: left; margin: 0 auto 20px auto; max-width: 400px;"><li>The quantity and quality of your completed tasks</li><li>How well your decisions align with Optimo\'s company culture</li></ul><p>Click "Next" when you\'re ready to begin your workday.</p>',
     highlight: null,
     action: 'click_next'
-    // Remove the onEnter completely
 }
         );
         
         return steps;
     }
 
-    start() {
-        this.isActive = true;
-        this.currentStep = 0;
-        this.steps = this.defineSteps();
-        this.element.classList.remove('hidden');
-        
-        if (this.experiment.clock) {
-            this.experiment.clock.pause();
-        }
-        
-        this.showStep(0);
-        console.log('Tutorial started with', this.emailCount, 'initial emails');
+start() {
+    this.isActive = true;
+    this.currentStep = 0;
+    this.steps = this.defineSteps();
+    this.element.classList.remove('hidden');
+    
+    // ADD tutorial-active class to body
+    document.body.classList.add('tutorial-active');
+    
+    if (this.experiment.clock) {
+        this.experiment.clock.pause();
     }
+    
+    this.showStep(0);
+    console.log('Tutorial started with', this.emailCount, 'initial emails');
+}
 
     showStep(stepIndex) {
-        if (stepIndex >= this.steps.length) {
-            this.end();
-            return;
-        }
+    if (stepIndex >= this.steps.length) {
+        this.end();
+        return;
+    }
 
-        const step = this.steps[stepIndex];
-        this.textElement.innerHTML = step.message;
-        
-        const messageContainer = document.querySelector('.tutorial-message-container');
-        messageContainer.classList.remove('bottom-right', 'bottom-left', 'top-left', 'center-bottom', 'top-right');
+    const step = this.steps[stepIndex];
+    this.textElement.innerHTML = step.message;
+    
+    const messageContainer = document.querySelector('.tutorial-message-container');
+    messageContainer.classList.remove('bottom-right', 'bottom-left', 'top-left', 'center-bottom', 'top-right', 'fullscreen'); // ADD fullscreen to removal
+    
+    // CHECK IF IT'S THE FINAL STEP
+    if (step.id === 'tutorial_complete') {
+        messageContainer.classList.add('fullscreen');
+    } else if (step.highlight && step.highlight.length > 0) {
+        // ... existing positioning logic
+    } else {
+        messageContainer.classList.add('center-bottom');
+    }
         
         if (step.highlight && step.highlight.length > 0) {
             const firstHighlight = step.highlight[0];
@@ -339,15 +370,20 @@ steps.push({
             step.onEnter();
         }
         
-        if (step.action === 'click_next') {
-            this.nextButton.style.display = 'block';
-            this.nextButton.disabled = false;
-        } else {
-            this.nextButton.style.display = 'none';
-            if (step.validation && step.checkInterval) {
-                this.startValidationCheck(step);
-            }
-        }
+if (step.action === 'click_next') {
+    this.nextButton.style.display = 'block';
+    this.nextButton.disabled = true; // START DISABLED
+    
+    // ENABLE AFTER 2 SECONDS
+    setTimeout(() => {
+        this.nextButton.disabled = false;
+    }, 2000);
+} else {
+    this.nextButton.style.display = 'none';
+    if (step.validation && step.checkInterval) {
+        this.startValidationCheck(step);
+    }
+}
         
         console.log('Tutorial step:', step.id);
     }
@@ -425,25 +461,28 @@ startValidationCheck(step) {
         this.showStep(this.currentStep);
     }
 
-    end() {
-        this.isActive = false;
-        this.clearHighlight();
-        this.element.classList.add('hidden');
-        
-        if (this.validationInterval) {
-            clearInterval(this.validationInterval);
-        }
-        
-        console.log('Tutorial ended');
-        
-        if (this.experiment.clock) {
-            this.experiment.clock.resume();
-        }
-        
-        if (this.experiment.startFreePlay) {
-            this.experiment.startFreePlay();
-        }
+end() {
+    this.isActive = false;
+    this.clearHighlight();
+    this.element.classList.add('hidden');
+    
+    // REMOVE tutorial-active class
+    document.body.classList.remove('tutorial-active');
+    
+    if (this.validationInterval) {
+        clearInterval(this.validationInterval);
     }
+    
+    console.log('Tutorial ended');
+    
+    if (this.experiment.clock) {
+        this.experiment.clock.resume();
+    }
+    
+    if (this.experiment.startFreePlay) {
+        this.experiment.startFreePlay();
+    }
+}
 
     // Validation Methods
 /**

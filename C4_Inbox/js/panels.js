@@ -71,29 +71,36 @@ createGamePanel() {
             <div class="game-container">
                 <button id="close-game-btn" class="close-game-btn">✕ Close Game</button>
                 <h3>Snake Game</h3>
-                <p>Use arrow keys to move. Press any arrow key to start.</p>
+                
+                <div style="background-color: #e8f5e9; padding: 12px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #27ae60; text-align: left; max-width: 350px; margin-left: auto; margin-right: auto;">
+                    <strong>🎮 How to Play:</strong><br>
+                    • Use <strong>arrow keys</strong> (↑ ↓ ← →) to control the snake<br>
+                    • Eat the <span style="color: #e74c3c;">■ red food</span> to grow longer<br>
+                    • Avoid hitting walls or your own tail<br>
+                    • Press any arrow key to start!
+                </div>
+                
                 <canvas id="snake-canvas" width="300" height="300"></canvas>
-                <!-- CHANGED from width="400" height="400" -->
                 <div class="game-score">Score: <span id="game-score">0</span></div>
             </div>
         </div>
     `;
-        
-        const mainContent = document.getElementById('main-content');
-        mainContent.appendChild(gamePanel);
-        
-        this.panels.game = gamePanel;
-        
-        // Add close button handler
-        setTimeout(() => {
-            const closeGameBtn = document.getElementById('close-game-btn');
-            if (closeGameBtn) {
-                closeGameBtn.addEventListener('click', () => {
-                    this.switchPanel('email');
-                });
-            }
-        }, 100);
-    }
+    
+    const mainContent = document.getElementById('main-content');
+    mainContent.appendChild(gamePanel);
+    
+    this.panels.game = gamePanel;
+    
+    // Add close button handler
+    setTimeout(() => {
+        const closeGameBtn = document.getElementById('close-game-btn');
+        if (closeGameBtn) {
+            closeGameBtn.addEventListener('click', () => {
+                this.switchPanel('email');
+            });
+        }
+    }, 100);
+}
     /**
      * Set up navigation button listeners
      */
