@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Task</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Timer -->
+    <div class="timer-container">
+        <div class="timer-label">Time Remaining</div>
+        <div class="timer-display" id="timer-display">5:00</div>
+    </div>
+    
+    <div class="activity-container">
+        <div class="activity-box">
+            <h2>Snake Game</h2>
+            
+            <div class="game-instructions">
+                <strong>🎮 How to Play:</strong><br>
+                • Use <strong>arrow keys</strong> (↑ ↓ ← →) to control the snake<br>
+                • Eat the <span style="color: #e74c3c;">■ red food</span> to grow longer<br>
+                • Avoid hitting walls or your own tail<br>
+                • Press any arrow key to start!
+            </div>
+            
+            <canvas id="snake-canvas" width="400" height="400"></canvas>
+            <div class="game-score">Score: <span id="game-score">0</span></div>
+            <div class="game-score" style="font-size: 16px; color: #7f8c8d; margin-top: 10px;">
+                Games Played: <span id="games-played">0</span>
+            </div>
+            
+            <div class="continue-btn-container" id="continue-container">
+                <button class="btn-primary" id="continue-btn">Continue to Survey</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/timer.js"></script>
+    <script src="js/snake-game.js"></script>
+    <script>
+        // Track activity start
+        const activityStartTime = Date.now();
+        
+        // Initialize timer
+        const timer = new Timer(300, () => {
+            // Timer complete - show continue button
+            document.getElementById('continue-container').classList.add('visible');
+        });
+        timer.start();
+        
+        // Initialize snake game
+        const gameData = {
+            gamesPlayed: 0,
+            totalScore: 0,
+            scores: []
+        };
+        
+        const snakeGame = new SnakeGame('snake-canvas', (score) => {
+            // Game over callback
+            gameData.gamesPlayed++;
+            gameData.totalScore += score;
+            gameData.scores.push(score);
+            
+            document.getElementById('games-played').textContent = gameData.gamesPlayed;
+        });
+        
+        // Continue button
+        document.getElementById('continue-btn').addEventListener('click', () => {
+            const timeOnPage = Date.now() - activityStartTime;
+            
+            // Save data to sessionStorage
+            sessionStorage.setItem('activityData', JSON.stringify({
+                condition: 'snake',
+                timeOnPage: timeOnPage,
+                gamesPlayed: gameData.gamesPlayed,
+                totalScore: gameData.totalScore,
+                averageScore: gameData.gamesPlayed > 0 ? gameData.totalScore / gameData.gamesPlayed : 0,
+                allScores: gameData.scores
+            }));
+            
+            window.location.href = 'survey.html';
+        });
+    </script>
+
+    <!-- ADD THIS NEW SCRIPT -->
+    <script>
+        // Warn before closing/refreshing
+        window.addEventListener('beforeunload', (e) => {
+            e.preventDefault();
+            e.returnValue = '';
+            return '';
+        });
+    </script>
+</body>
+</html>
+
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Task</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .task-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .task-instructions {
+            background-color: #e8f5e9;
+            padding: 15px 20px;
+            border-radius: 6px;
+            border-left: 4px solid #27ae60;
+            margin-bottom: 20px;
+        }
+        
+        .task-body {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+        
+        .map-container {
+            flex: 0 0 400px;
+        }
+        
+        #routing-map {
+            border: 2px solid #34495e;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .route-controls {
+            flex: 1;
+        }
+        
+        .route-dropdowns {
+            margin-bottom: 20px;
+        }
+        
+        .route-stop {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 15px;
+        }
+        
+        .route-stop label {
+            min-width: 80px;
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        .route-dropdown {
+            flex: 1;
+            padding: 10px 12px;
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: #fff;
+            cursor: pointer;
+        }
+        
+        .route-summary {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 2px solid #ecf0f1;
+        }
+        
+        #route-distance {
+            font-size: 20px;
+            font-weight: 700;
+            color: #27ae60;
+        }
+        
+        .task-submit-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .task-submit-btn:hover {
+            background-color: #229954;
+        }
+        
+        .task-stats {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <!-- Timer -->
+    <div class="timer-container">
+        <div class="timer-label">Time Remaining</div>
+        <div class="timer-display" id="timer-display">5:00</div>
+    </div>
+    
+    <div class="activity-container">
+        <div class="activity-box">
+            <h2>Delivery Route Planning</h2>
+            
+            <div class="task-container">
+                <div class="task-instructions">
+                    <strong>Your Task:</strong> Plan an efficient delivery route by selecting stops in order. 
+                    Your goal is to minimize the total distance traveled.
+                </div>
+                
+                <div class="task-body">
+                    <div class="map-container">
+                        <canvas id="routing-map" width="400" height="400"></canvas>
+                    </div>
+                    
+                    <div class="route-controls">
+                        <h4>Select Route Stops</h4>
+                        <div class="route-dropdowns" id="route-dropdowns">
+                            <!-- Will be populated by JS -->
+                        </div>
+                        
+                        <div class="route-summary">
+                            <div style="font-size: 16px; color: #2c3e50; margin-bottom: 10px;">
+                                <strong>Estimated Distance:</strong>
+                            </div>
+                            <div id="route-distance">-- miles</div>
+                        </div>
+                        
+                        <button class="task-submit-btn" id="submit-route">Submit Route</button>
+                    </div>
+                </div>
+                
+                <div class="task-stats">
+                    Tasks Completed: <strong><span id="tasks-completed">0</span></strong> | 
+                    Average Efficiency: <strong><span id="avg-efficiency">--</span>%</strong>
+                </div>
+            </div>
+            
+            <div class="continue-btn-container" id="continue-container">
+                <button class="btn-primary" id="continue-btn">Continue to Survey</button>
+            </div>
+        </div>
+    </div>
+    
+<script src="js/pathfinding.js"></script>
+<script src="js/timer.js"></script>
+<script src="js/routing-task.js"></script>
+    <script>
+        // Track activity start
+        const activityStartTime = Date.now();
+        
+        // Initialize timer
+        const timer = new Timer(300, () => {
+            // Timer complete - show continue button
+            document.getElementById('continue-container').classList.add('visible');
+        });
+        timer.start();
+        
+        // Initialize routing task
+        const taskData = {
+            tasksCompleted: 0,
+            efficiencies: [],
+            totalEfficiency: 0
+        };
+        
+        const routingTask = new RoutingTask('routing-map', (efficiency) => {
+            // Task completed callback
+            taskData.tasksCompleted++;
+            taskData.efficiencies.push(efficiency);
+            taskData.totalEfficiency += efficiency;
+            
+            const avgEfficiency = taskData.totalEfficiency / taskData.tasksCompleted;
+            
+            document.getElementById('tasks-completed').textContent = taskData.tasksCompleted;
+            document.getElementById('avg-efficiency').textContent = avgEfficiency.toFixed(1);
+        });
+        
+        // Continue button
+        document.getElementById('continue-btn').addEventListener('click', () => {
+            const timeOnPage = Date.now() - activityStartTime;
+            
+            // Save data to sessionStorage
+            sessionStorage.setItem('activityData', JSON.stringify({
+                condition: 'task',
+                timeOnPage: timeOnPage,
+                tasksCompleted: taskData.tasksCompleted,
+                averageEfficiency: taskData.tasksCompleted > 0 ? taskData.totalEfficiency / taskData.tasksCompleted : 0,
+                allEfficiencies: taskData.efficiencies
+            }));
+            
+            window.location.href = 'survey.html';
+        });
+    </script>
+        <script>
+        // Warn before closing/refreshing
+        window.addEventListener('beforeunload', (e) => {
+            e.preventDefault();
+            e.returnValue = '';
+            return '';
+        });
+    </script>
+</body>
+</html>

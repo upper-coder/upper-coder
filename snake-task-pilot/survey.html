@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="content-box">
+            <h1>Survey - Page <span id="page-number">1</span> of 2</h1>
+            
+            <!-- PAGE 1: Enjoyment Questions -->
+            <div id="page-1">
+                <p style="margin-bottom: 30px;">Please answer the following questions about your experience with the activity.</p>
+                
+                <form id="survey-form-page1">
+                    <div id="enjoyment-questions">
+                        <!-- Will be populated with randomized questions -->
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="margin-top: 40px;">Continue</button>
+                </form>
+            </div>
+
+            <!-- PAGE 2: Demographics -->
+            <div id="page-2" class="hidden">
+                <p style="margin-bottom: 30px;">Finally, please provide some demographic information.</p>
+                
+                <form id="survey-form-page2">
+                    <!-- Prolific ID -->
+                    <div class="survey-question">
+                        <label>What is your Prolific ID?</label>
+                        <input type="text" id="prolific-id" name="prolific_id" 
+                               class="text-input" 
+                               placeholder="Enter your Prolific ID" 
+                               required>
+                    </div>
+
+                    <!-- Age -->
+                    <div class="survey-question">
+                        <label>What is your age?</label>
+                        <input type="number" id="age" name="age" 
+                               class="text-input" 
+                               min="18" max="100" 
+                               placeholder="Enter your age" 
+                               required>
+                    </div>
+
+                    <!-- Gender -->
+                    <div class="survey-question">
+                        <label>What is your gender?</label>
+                        <select id="gender" name="gender" class="select-input" required>
+                            <option value="">-- Select --</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="non-binary">Non-binary</option>
+                            <option value="prefer-not-to-say">Prefer not to say</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <!-- Education -->
+                    <div class="survey-question">
+                        <label>What is the highest level of education you have completed?</label>
+                        <select id="education" name="education" class="select-input" required>
+                            <option value="">-- Select --</option>
+                            <option value="less-than-high-school">Less than high school</option>
+                            <option value="high-school">High school or equivalent</option>
+                            <option value="some-college">Some college</option>
+                            <option value="associate">Associate degree</option>
+                            <option value="bachelor">Bachelor's degree</option>
+                            <option value="master">Master's degree</option>
+                            <option value="doctorate">Doctorate or professional degree</option>
+                        </select>
+                    </div>
+
+                    <!-- Ethnicity -->
+                    <div class="survey-question">
+                        <label>What is your ethnicity? (Select all that apply)</label>
+                        <div style="margin-top: 10px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: normal;">
+                                <input type="checkbox" name="ethnicity" value="white"> White/Caucasian
+                            </label>
+                            <label style="display: block; margin-bottom: 8px; font-weight: normal;">
+                                <input type="checkbox" name="ethnicity" value="black"> Black/African American
+                            </label>
+                            <label style="display: block; margin-bottom: 8px; font-weight: normal;">
+                                <input type="checkbox" name="ethnicity" value="hispanic"> Hispanic/Latino
+                            </label>
+                            <label style="display: block; margin-bottom: 8px; font-weight: normal;">
+                                <input type="checkbox" name="ethnicity" value="asian"> Asian
+                            </label>
+                            <label style="display: block; margin-bottom: 8px; font-weight: normal;">
+                                <input type="checkbox" name="ethnicity" value="native-american"> Native American/Alaska Native
+                            </label>
+                            <label style="display: block; margin-bottom: 8px; font-weight: normal;">
+                                <input type="checkbox" name="ethnicity" value="pacific-islander"> Native Hawaiian/Pacific Islander
+                            </label>
+                            <label style="display: block; margin-bottom: 8px; font-weight: normal;">
+                                <input type="checkbox" name="ethnicity" value="other"> Other
+                            </label>
+                            <label style="display: block; margin-bottom: 8px; font-weight: normal;">
+                                <input type="checkbox" name="ethnicity" value="prefer-not-to-say"> Prefer not to say
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="margin-top: 40px;">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/datapipe.js"></script>
+    <script>
+        // Define enjoyment questions
+        const enjoymentQuestions = [
+            {
+                id: 'q1_enjoyment',
+                text: 'How much did you enjoy the activity you worked on during the study?',
+                lowLabel: 'Not at all',
+                highLabel: 'Very much'
+            },
+            {
+                id: 'q2_interesting',
+                text: 'How interesting was it to work on the activity?',
+                lowLabel: 'Not at all',
+                highLabel: 'Very much'
+            },
+            {
+                id: 'q3_work_fun',
+                text: 'To what extent did the activity in this study feel more like work or more like fun?',
+                lowLabel: 'More like work',
+                highLabel: 'More like fun'
+            }
+        ];
+
+        // Randomize question order
+        const shuffled = enjoymentQuestions.sort(() => Math.random() - 0.5);
+
+        // Render randomized questions
+        const container = document.getElementById('enjoyment-questions');
+        shuffled.forEach((q, index) => {
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'survey-question';
+            questionDiv.innerHTML = `
+                <label>${index + 1}. ${q.text}</label>
+                <div class="likert-scale">
+                    <span class="likert-label start">${q.lowLabel}</span>
+                    <div class="likert-options">
+                        ${[1, 2, 3, 4, 5, 6, 7].map(val => `
+                            <label class="likert-option">
+                                <input type="radio" name="${q.id}" value="${val}" required>
+                                <span>${val}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                    <span class="likert-label end">${q.highLabel}</span>
+                </div>
+            `;
+            container.appendChild(questionDiv);
+        });
+
+        // Store page 1 data
+        let page1Data = {};
+
+        // Handle page 1 submission
+        document.getElementById('survey-form-page1').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(e.target);
+            page1Data = {
+                q1_enjoyment: parseInt(formData.get('q1_enjoyment')),
+                q2_interesting: parseInt(formData.get('q2_interesting')),
+                q3_work_fun: parseInt(formData.get('q3_work_fun'))
+            };
+            
+            // Show page 2
+            document.getElementById('page-1').classList.add('hidden');
+            document.getElementById('page-2').classList.remove('hidden');
+            document.getElementById('page-number').textContent = '2';
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        });
+
+        // Handle page 2 submission
+        document.getElementById('survey-form-page2').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Get demographics
+            const formData = new FormData(e.target);
+            
+            // Get ethnicity (multi-select)
+            const ethnicity = Array.from(formData.getAll('ethnicity'));
+            
+            const demographics = {
+                prolific_id: formData.get('prolific_id'),
+                age: parseInt(formData.get('age')),
+                gender: formData.get('gender'),
+                education: formData.get('education'),
+                ethnicity: ethnicity
+            };
+            
+            // Get activity data from sessionStorage
+            const activityData = JSON.parse(sessionStorage.getItem('activityData') || '{}');
+            const participantId = sessionStorage.getItem('participantId');
+            const condition = sessionStorage.getItem('condition');
+            const startTime = parseInt(sessionStorage.getItem('startTime'));
+            
+            // Compile full data
+            const fullData = {
+                participantId: participantId,
+                condition: condition,
+                startTime: startTime,
+                endTime: Date.now(),
+                totalDuration: Date.now() - startTime,
+                activityData: activityData,
+                surveyResponses: page1Data,
+                demographics: demographics,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('Submitting data:', fullData);
+            
+            // Disable submit button
+            e.target.querySelector('button[type="submit"]').disabled = true;
+            e.target.querySelector('button[type="submit"]').textContent = 'Submitting...';
+            
+            // Send to DataPipe
+            const dataPipe = new DataPipe('bjp2waSwmxNW');
+            const result = await dataPipe.save(fullData);
+            
+            if (result.success) {
+                // Show completion page
+                document.body.innerHTML = `
+                    <div class="container">
+                        <div class="content-box" style="text-align: center;">
+                            <h1>✓ Study Complete!</h1>
+                            <p style="font-size: 18px; margin: 30px 0;">
+                                Thank you for participating in this study.
+                            </p>
+                            <p style="color: #7f8c8d;">
+                                Your responses have been recorded. You may now close this window.
+                            </p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                alert('There was an error saving your data. Please contact the researcher with this code: ' + participantId);
+                e.target.querySelector('button[type="submit"]').disabled = false;
+                e.target.querySelector('button[type="submit"]').textContent = 'Submit';
+            }
+        });
+    </script>
+</body>
+</html>

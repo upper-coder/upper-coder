@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instructions</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="content-box">
+            <h1>Study Instructions</h1>
+            
+            <p style="font-size: 18px; line-height: 1.8;">
+                In this study, you will be asked to perform a task for <strong>5 minutes</strong>.
+            </p>
+            
+            <p style="font-size: 18px; line-height: 1.8;">
+                A timer will count down from 5:00. Please engage with the task during this time.
+            </p>
+            
+            <p style="font-size: 18px; line-height: 1.8;">
+                After the timer reaches 0:00, a "Continue" button will appear. Click it to proceed to a brief survey.
+            </p>
+            
+            <p style="font-size: 18px; line-height: 1.8; margin-top: 30px;">
+                <strong>Click "Begin" when you're ready to start the 5-minute task.</strong>
+            </p>
+            
+            <button id="begin-btn" class="btn-primary">Begin</button>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('begin-btn').addEventListener('click', () => {
+            const condition = sessionStorage.getItem('condition');
+            
+            if (condition === 'snake') {
+                window.location.href = 'snake-pilot.html';
+            } else {
+                window.location.href = 'task-pilot.html';
+            }
+        });
+    </script>
+</body>
+</html>

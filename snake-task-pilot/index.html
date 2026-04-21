@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Enjoyment Study</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="content-box">
+            <h1>Research Study: Task Enjoyment</h1>
+            
+            <div class="consent-form">
+                <h2>Informed Consent</h2>
+                
+                <p>You are invited to participate in a research study examining how people experience different work-related activities.</p>
+                
+                <h3>What you will do:</h3>
+                <ul>
+                    <li>Complete a 5-minute activity</li>
+                    <li>Answer a brief survey about your experience</li>
+                    <li>Total time: approximately 10 minutes</li>
+                </ul>
+                
+                <h3>Risks and Benefits:</h3>
+                <p>There are no known risks associated with this study. You will receive [COMPENSATION DETAILS] for your participation.</p>
+                
+                <h3>Confidentiality:</h3>
+                <p>Your responses will be kept confidential. All data will be stored securely and reported only in aggregate form.</p>
+                
+                <h3>Voluntary Participation:</h3>
+                <p>Your participation is completely voluntary. You may withdraw at any time without penalty.</p>
+                
+                <h3>Contact Information:</h3>
+                <p>If you have questions, please contact [YOUR NAME] at [YOUR EMAIL].</p>
+                
+                <div class="consent-checkbox">
+                    <label>
+                        <input type="checkbox" id="consent-check">
+                        I have read and understood the above information, and I agree to participate in this study.
+                    </label>
+                </div>
+                
+                <button id="consent-btn" class="btn-primary" disabled>Continue to Study</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Enable button when consent is checked
+        const consentCheck = document.getElementById('consent-check');
+        const consentBtn = document.getElementById('consent-btn');
+        
+        consentCheck.addEventListener('change', () => {
+            consentBtn.disabled = !consentCheck.checked;
+        });
+        
+        // Advance to instructions
+        consentBtn.addEventListener('click', () => {
+            // Random assignment
+            const condition = Math.random() < 0.5 ? 'snake' : 'task';
+            sessionStorage.setItem('condition', condition);
+            sessionStorage.setItem('startTime', Date.now());
+            sessionStorage.setItem('participantId', 'P_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9));
+            
+            window.location.href = 'instructions.html';
+        });
+    </script>
+</body>
+</html>

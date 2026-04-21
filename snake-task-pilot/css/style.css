@@ -1,0 +1,289 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.content-box {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 40px;
+    max-width: 800px;
+    width: 100%;
+}
+
+h1 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 28px;
+}
+
+h2 {
+    color: #34495e;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    font-size: 22px;
+}
+
+h3 {
+    color: #34495e;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+p {
+    margin-bottom: 15px;
+    color: #555;
+}
+
+ul {
+    margin-left: 25px;
+    margin-bottom: 15px;
+}
+
+li {
+    margin-bottom: 8px;
+}
+
+.consent-checkbox {
+    margin: 30px 0;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+}
+
+.consent-checkbox label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.consent-checkbox input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 14px 35px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.btn-primary:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Timer styles */
+.timer-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+}
+
+.timer-display {
+    font-size: 32px;
+    font-weight: bold;
+    color: #2c3e50;
+    font-family: 'Courier New', monospace;
+}
+
+.timer-label {
+    font-size: 12px;
+    color: #7f8c8d;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+/* Activity container */
+.activity-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    padding-top: 100px;
+}
+
+.activity-box {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 30px;
+    text-align: center;
+}
+
+.continue-btn-container {
+    margin-top: 30px;
+    display: none;
+}
+
+.continue-btn-container.visible {
+    display: block;
+}
+
+/* Snake game styles */
+#snake-canvas {
+    border: 3px solid #34495e;
+    border-radius: 4px;
+    background-color: #ecf0f1;
+    display: block;
+    margin: 20px auto;
+}
+
+.game-score {
+    font-size: 24px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-top: 15px;
+}
+
+.game-instructions {
+    background-color: #e8f5e9;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    border-left: 4px solid #27ae60;
+    text-align: left;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Survey styles */
+.survey-question {
+    margin-bottom: 35px;
+    text-align: left;
+}
+
+.survey-question label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 15px;
+    font-size: 16px;
+    color: #2c3e50;
+}
+
+.likert-scale {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.likert-label {
+    font-size: 13px;
+    color: #7f8c8d;
+    min-width: 80px;
+}
+
+.likert-label.start {
+    text-align: right;
+}
+
+.likert-label.end {
+    text-align: left;
+}
+
+.likert-options {
+    display: flex;
+    gap: 15px;
+}
+
+.likert-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+}
+
+.likert-option input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.likert-option span {
+    font-size: 14px;
+    font-weight: 600;
+    color: #34495e;
+}
+
+/* Text input styles */
+.text-input {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 16px;
+    border: 2px solid #bdc3c7;
+    border-radius: 6px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.text-input:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+/* Select dropdown styles */
+.select-input {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 16px;
+    border: 2px solid #bdc3c7;
+    border-radius: 6px;
+    background-color: white;
+    cursor: pointer;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.select-input:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+/* Hidden class */
+.hidden {
+    display: none !important;
+}
