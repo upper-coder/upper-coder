@@ -103,5 +103,16 @@
      <script src="js/consent.js"></script>
      <script src="js/intro-pages.js"></script>
     <script src="js/experiment.js"></script>
+    <script>
+    // Warn before closing/refreshing during experiment
+    window.addEventListener('beforeunload', (e) => {
+        // Only show warning if experiment has started
+        if (window.experiment && window.experiment.state && window.experiment.state.phase !== 'CONSENT') {
+            e.preventDefault();
+            e.returnValue = '';
+            return '';
+        }
+    });
+</script>
 </body>
 </html>
