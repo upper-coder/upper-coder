@@ -21,7 +21,6 @@ class Survey {
         this.blocks = [
             {
                 id: 'job_satisfaction',
-                title: 'Job Satisfaction',
                 randomize: true,
                 items: [
                     {
@@ -39,7 +38,6 @@ class Survey {
             },
             {
                 id: 'role_ambiguity',
-                title: 'Role Clarity',
                 instruction: 'How much do you agree with the following statements?',
                 randomize: true,
                 items: [
@@ -91,7 +89,6 @@ class Survey {
             },
             {
                 id: 'turnover_intentions',
-                title: 'Future Intentions',
                 instruction: 'If you were actually an employee at Optimo...',
                 randomize: true,
                 items: [
