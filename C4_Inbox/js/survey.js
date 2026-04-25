@@ -125,14 +125,8 @@ class Survey {
                 randomize: false,
                 items: [
                     {
-                        id: 'prolific_id',
-                        question: 'What is your Prolific ID?',
-                        type: 'text',
-                        required: true
-                    },
-                    {
                         id: 'age',
-                        question: 'How many years old are you?',
+                        question: 'How old are you?',
                         type: 'number',
                         required: true,
                         min: 18,

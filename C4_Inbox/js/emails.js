@@ -303,10 +303,12 @@ this.emailStates[emailId] = {
                 </div>
             <div class="email-full-body">${email.body}</div>
             ${email.hasButton ? `
-                <button class="email-action-btn" data-action="${email.buttonAction}">
-                    ${email.buttonText}
-                </button>
-            ` : ''}
+    <button class="email-action-btn" 
+            data-action="${email.buttonAction}"
+            ${email.buttonAction === 'open_wellness' && (!this.experiment.tutorial || !this.experiment.tutorial.isActive) ? 'disabled style="background-color: #95a5a6; cursor: not-allowed; opacity: 0.6;"' : ''}>
+        ${email.buttonText}
+    </button>
+` : ''}
             ${email.canReply ? `
                 <div class="email-reply-box">
                     <h4>Reply:</h4>
@@ -334,31 +336,40 @@ this.emailStates[emailId] = {
     /**
      * Handle email action buttons (wellness, help, jira)
      */
-    handleEmailAction(action, email) {
-        console.log('Email action:', action);
-        
-        switch(action) {
-            case 'open_wellness':
+    /**
+ * Handle email action buttons (wellness, help, jira)
+ */
+handleEmailAction(action, email) {
+    console.log('Email action:', action);
+    
+    switch(action) {
+        case 'open_wellness':
+            // Only allow during tutorial, not during free play
+            if (this.experiment.tutorial && this.experiment.tutorial.isActive) {
                 if (this.experiment.overlay) {
                     this.experiment.overlay.show('wellness', {}, () => {
                         console.log('Wellness exercise completed');
                     });
                 }
-                break;
-                
-            case 'open_help_tasks':
-                if (this.experiment.overlay) {
-                    this.experiment.overlay.show('work', { isHelping: true });
-                }
-                break;
-                
-            case 'open_jira':
-                if (this.experiment.overlay) {
-                    this.experiment.overlay.show('jira', {});
-                }
-                break;
-        }
+            } else {
+                // During free play - show message instead
+                alert('This wellness exercise was completed during the tutorial and cannot be repeated.');
+            }
+            break;
+            
+        case 'open_help_tasks':
+            if (this.experiment.overlay) {
+                this.experiment.overlay.show('work', { isHelping: true });
+            }
+            break;
+            
+        case 'open_jira':
+            if (this.experiment.overlay) {
+                this.experiment.overlay.show('jira', {});
+            }
+            break;
     }
+}
 
     /**
      * Close currently open email (track time)

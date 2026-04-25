@@ -281,13 +281,13 @@ steps.push({
 },
             {
                 id: 'final_reminder',
-                message: 'Your bonus will be based on your task performance and other factors. Work efficiently and check your emails regularly.',
+                message: 'Work efficiently and make decisions that you think are appropriate for this workplace.',
                 highlight: ['#header'],
                 action: 'click_next'
             },
 {
     id: 'tutorial_complete',
-    message: '<h2 style="margin-bottom: 20px; color: #2c3e50;">Tutorial Complete!</h2><p style="margin-bottom: 15px;">You have until <strong>5:00 PM</strong> to complete your workday.</p><p style="margin-bottom: 15px;"><strong>Your goal:</strong> Complete as many delivery route tasks as efficiently as possible.</p><p style="margin-bottom: 15px;"><strong>Your bonus will be based on:</strong></p><ul style="text-align: left; margin: 0 auto 20px auto; max-width: 400px;"><li>The quantity and quality of your completed tasks</li><li>How well your decisions align with Optimo\'s company culture</li></ul><p>Click "Next" when you\'re ready to begin your workday.</p>',
+    message: '<h2 style="margin-bottom: 20px; color: #2c3e50;">Tutorial Complete!</h2><p style="margin-bottom: 15px;">You have until <strong>5:00 PM</strong> to complete your workday.</p><p style="margin-bottom: 15px;">Your goal:</strong> Complete as many delivery route tasks as efficiently as possible.</p><p style="margin-bottom: 15px;"><strong>You\'ll also receive emails and other tasks throughout the day - manage your time as you see fit.<p>Click "Next" when you\'re ready to begin your workday.</p>',
     highlight: null,
     action: 'click_next'
 }
