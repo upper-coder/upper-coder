@@ -29,15 +29,7 @@
                 <p style="margin-bottom: 30px;">Finally, please provide some demographic information.</p>
                 
                 <form id="survey-form-page2">
-                    <!-- Prolific ID -->
-                    <div class="survey-question">
-                        <label>What is your Prolific ID?</label>
-                        <input type="text" id="prolific-id" name="prolific_id" 
-                               class="text-input" 
-                               placeholder="Enter your Prolific ID" 
-                               required>
-                    </div>
-
+                    
                     <!-- Age -->
                     <div class="survey-question">
                         <label>What is your age?</label>
@@ -198,7 +190,6 @@
             const ethnicity = Array.from(formData.getAll('ethnicity'));
             
             const demographics = {
-                prolific_id: formData.get('prolific_id'),
                 age: parseInt(formData.get('age')),
                 gender: formData.get('gender'),
                 education: formData.get('education'),
