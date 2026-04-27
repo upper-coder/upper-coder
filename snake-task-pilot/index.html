@@ -53,6 +53,13 @@
     </div>
     
     <script>
+const urlParams = new URLSearchParams(window.location.search);
+const prolificPID = urlParams.get('PROLIFIC_PID') || 'unknown';
+const studyID = urlParams.get('STUDY_ID') || 'unknown';
+const sessionID = urlParams.get('SESSION_ID') || 'unknown';
+
+console.log('Prolific ID captured:', prolificPID);
+        
         // Enable button when consent is checked
         const consentCheck = document.getElementById('consent-check');
         const consentBtn = document.getElementById('consent-btn');
@@ -69,6 +76,10 @@
             sessionStorage.setItem('startTime', Date.now());
             sessionStorage.setItem('participantId', 'P_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9));
             
+    sessionStorage.setItem('prolificPID', prolificPID);
+    sessionStorage.setItem('studyID', studyID);
+    sessionStorage.setItem('sessionID', sessionID);
+
             window.location.href = 'instructions.html';
         });
     </script>

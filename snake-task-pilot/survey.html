@@ -205,24 +205,32 @@
                 ethnicity: ethnicity
             };
             
-            // Get activity data from sessionStorage
-            const activityData = JSON.parse(sessionStorage.getItem('activityData') || '{}');
-            const participantId = sessionStorage.getItem('participantId');
-            const condition = sessionStorage.getItem('condition');
-            const startTime = parseInt(sessionStorage.getItem('startTime'));
-            
-            // Compile full data
-            const fullData = {
-                participantId: participantId,
-                condition: condition,
-                startTime: startTime,
-                endTime: Date.now(),
-                totalDuration: Date.now() - startTime,
-                activityData: activityData,
-                surveyResponses: page1Data,
-                demographics: demographics,
-                timestamp: new Date().toISOString()
-            };
+           // Get activity data from sessionStorage
+const activityData = JSON.parse(sessionStorage.getItem('activityData') || '{}');
+const participantId = sessionStorage.getItem('participantId');
+const condition = sessionStorage.getItem('condition');
+const startTime = parseInt(sessionStorage.getItem('startTime'));
+
+// ADD THESE LINES - Get Prolific data
+const prolificPID = sessionStorage.getItem('prolificPID') || 'unknown';
+const studyID = sessionStorage.getItem('studyID') || 'unknown';
+const sessionID = sessionStorage.getItem('sessionID') || 'unknown';
+
+// Compile full data
+const fullData = {
+    participantId: participantId,
+    prolificPID: prolificPID,      // ADD
+    studyID: studyID,              // ADD
+    sessionID: sessionID,          // ADD
+    condition: condition,
+    startTime: startTime,
+    endTime: Date.now(),
+    totalDuration: Date.now() - startTime,
+    activityData: activityData,
+    surveyResponses: page1Data,
+    demographics: demographics,
+    timestamp: new Date().toISOString()
+};
             
             console.log('Submitting data:', fullData);
             
