@@ -229,25 +229,50 @@ submitWellnessPage1() {
 showWellnessPage2() {
     const isParadox = this.experiment.state.mindset === 'paradox';
     
+    // Track when page 2 starts
+    this.page2StartTime = Date.now();
+    
     // Placeholder prompts for both conditions
     const prompt = isParadox 
-        ? "In today’s rapidly changing and volatile business environment, employees are increasingly confronted with paradoxical tensions. These tensions stem from competing demands, diverse values, and contrasting perspectives, often turning decision-making into a constant tug-of-war. For example, how can we develop new skills while honing existing skills? How can we be flexible while also complying with company policies? How can we be a good team player while striving to be the best? <br><br> Such tensions can feel paralyzing, but they don’t have to be. In fact, embracing these tensions and contradictions is beneficial. Instead of thinking of whether to do one or the other, thinking of how one can do both helps people generate innovative solutions that help them navigate these tensions. <br><br>Here at Optimo, we’re certain that employees face similar types of tensions, but we want to help you manage them. Think about some of the tensions you might’ve experienced here at Optimo. They could be mixed signals from your coworkers or supervisors about what you should do, whether you should compete against or cooperate with one another, and so on. Then, think carefully about how these things in tension might actually complement each other. For instance, how can you both be a team player and strive to be better than those around you without compromising on either? <br><br>Please write 2 to 3 sentences about some tensions you experience at Optimo and how you can deal with them."
-        : "In today’s rapidly changing and volatile business environment, employees are increasingly confronted with paradoxical tensions. These tensions stem from competing demands, diverse values, and contrasting perspectives, often turning decision-making into a constant tug-of-war. For example, how can we develop new skills while honing existing skills? How can we be flexible while also complying with company policies? How can we be a good team player while striving to be the best? <br><br>Such tensions can feel paralyzing, but they don’t have to be. In fact, prioritizing certain elements that seem to contradict or be in tension with other elements is beneficial. Choosing whether to do one or the other helps people navigate these tensions. <br><br>Here at Optimo, we’re certain that employees face similar types of tensions, but we want to help you manage them. Think about some of the tensions you might’ve experienced here at Optimo. They could be mixed signals from your coworkers or supervisors about what you should do, whether you should compete against or cooperate with one another, and so on. Then, think carefully about what you would prioritize among these things in tension. For instance, should you be more of a team player or strive to be better than those around you?<br><br>Please write 2 to 3 sentences about some tensions you experience at Optimo and how you can deal with them.";
+        ? "In today's rapidly changing and volatile business environment, employees are increasingly confronted with paradoxical tensions. These tensions stem from competing demands, diverse values, and contrasting perspectives, often turning decision-making into a constant tug-of-war. For example, how can we develop new skills while honing existing skills? How can we be flexible while also complying with company policies? How can we be a good team player while striving to be the best? <br><br> Such tensions can feel paralyzing, but they don't have to be. In fact, embracing these tensions and contradictions is beneficial. Instead of thinking of whether to do one or the other, thinking of how one can do both helps people generate innovative solutions that help them navigate these tensions. <br><br>Here at Optimo, we're certain that employees face similar types of tensions, but we want to help you manage them. Think about some of the tensions you might've experienced here at Optimo. They could be mixed signals from your coworkers or supervisors about what you should do, whether you should compete against or cooperate with one another, and so on. Then, think carefully about how these things in tension might actually complement each other. For instance, how can you both be a team player and strive to be better than those around you without compromising on either? <br><br>Please write 2 to 3 sentences about some tensions you experience at Optimo and how you can deal with them."
+        : "In today's rapidly changing and volatile business environment, employees are increasingly confronted with paradoxical tensions. These tensions stem from competing demands, diverse values, and contrasting perspectives, often turning decision-making into a constant tug-of-war. For example, how can we develop new skills while honing existing skills? How can we be flexible while also complying with company policies? How can we be a good team player while striving to be the best? <br><br>Such tensions can feel paralyzing, but they don't have to be. In fact, prioritizing certain elements that seem to contradict or be in tension with other elements is beneficial. Choosing whether to do one or the other helps people navigate these tensions. <br><br>Here at Optimo, we're certain that employees face similar types of tensions, but we want to help you manage them. Think about some of the tensions you might've experienced here at Optimo. They could be mixed signals from your coworkers or supervisors about what you should do, whether you should compete against or cooperate with one another, and so on. Then, think carefully about what you would prioritize among these things in tension. For instance, should you be more of a team player or strive to be better than those around you?<br><br>Please write 2 to 3 sentences about some tensions you experience at Optimo and how you can deal with them.";
     
     this.bodyElement.innerHTML = `
         <h2>Wellness Exercise - Part 2 of 3</h2>
         <p style="margin-bottom: 20px;">${prompt}</p>
         
         <form id="wellness-page2-form">
-            <textarea id="wellness-manipulation-response" 
-                      rows="8" 
-                      placeholder="Type your response here..." 
-                      required
-                      style="width: 100%; padding: 12px; border: 2px solid #bdc3c7; border-radius: 6px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; resize: vertical;"></textarea>
+           <textarea id="wellness-manipulation-response" 
+          rows="8" 
+          placeholder="Type your response here..." 
+          required
+          onpaste="return false"
+          oncopy="return false"
+          oncut="return false"
+          style="width: 100%; padding: 12px; border: 2px solid #bdc3c7; border-radius: 6px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; resize: vertical;"></textarea>
+            
+            <div style="font-size: 12px; color: #7f8c8d; margin-top: 5px;">
+                Character count: <span id="char-count">0</span> / 100 minimum
+            </div>
             
             <button type="submit" class="submit-btn" style="margin-top: 20px;">Continue</button>
         </form>
     `;
+    
+    // Disable copy-paste and right-click on wellness response
+    const textarea = document.getElementById('wellness-manipulation-response');
+    if (textarea) {
+        textarea.addEventListener('contextmenu', (e) => e.preventDefault());
+        textarea.addEventListener('paste', (e) => e.preventDefault());
+        textarea.addEventListener('copy', (e) => e.preventDefault());
+        textarea.addEventListener('cut', (e) => e.preventDefault());
+        
+        // Add character counter
+        textarea.addEventListener('input', () => {
+            const count = textarea.value.length;
+            document.getElementById('char-count').textContent = count;
+        });
+    }
     
     // Handle form submission
     document.getElementById('wellness-page2-form').addEventListener('submit', (e) => {
@@ -261,13 +286,29 @@ showWellnessPage2() {
  */
 submitWellnessPage2() {
     const response = document.getElementById('wellness-manipulation-response').value.trim();
+    const timeSpent = Date.now() - this.page2StartTime;
     
+    // Check if response is empty
     if (!response) {
         alert('Please enter a response before continuing.');
         return;
     }
     
+    // Check character minimum
+    if (response.length < 100) {
+        alert(`Please write at least 100 characters. Current: ${response.length}`);
+        return;
+    }
+    
+    // Check time spent
+    if (timeSpent < 20000) { // 20 seconds
+        const secondsLeft = Math.ceil((20000 - timeSpent) / 1000);
+        alert(`Please spend more time reflecting on the prompt before continuing. (${secondsLeft} seconds remaining)`);
+        return;
+    }
+    
     this.wellnessData.manipulationResponse = response;
+    this.wellnessData.timeOnPage2 = timeSpent;
     console.log('Manipulation response recorded');
     
     // Move to page 3
