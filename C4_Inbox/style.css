@@ -1410,3 +1410,15 @@ body.tutorial-active .email-item:not(.tutorial-highlighted) {
 .email-action-btn:disabled:hover {
     background-color: #95a5a6;
 }
+
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.2);
+    }
+}
