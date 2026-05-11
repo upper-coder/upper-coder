@@ -136,20 +136,20 @@ steps.push({
                     this.highlightElements([selector]);
                 }
             },
-            {
-                id: 'read_wellness',
-                message: 'Read the email and click the "Start Exercise" button to complete the wellness exercise.',
-                highlight: ['#email-viewer-pane'],
-                action: 'complete_wellness',
-                validation: () => this.wellnessCompleted(),
-                checkInterval: 1000,
-                onEnter: () => {
-                    // Pause clock during wellness exercise
-                    if (this.experiment.clock && this.experiment.clock.isRunning && !this.experiment.clock.isPaused) {
-                        this.experiment.clock.pause();
-                    }
-                }
-            },
+{
+    id: 'read_wellness',
+    message: 'Read the email and click the "Start Exercise" button to complete the wellness exercise. This will take a few minutes and has multiple parts.',
+    highlight: ['#email-viewer-pane'],
+    action: 'complete_wellness',
+    validation: () => this.wellnessCompleted(),
+    checkInterval: 1000,
+    onEnter: () => {
+        // Pause clock during wellness exercise
+        if (this.experiment.clock && this.experiment.clock.isRunning && !this.experiment.clock.isPaused) {
+            this.experiment.clock.pause();
+        }
+    }
+},
             {
                 id: 'clock_intro',
                 message: 'Notice the time - you arrived early! Feel free to relax before work starts at 9:00 AM.',

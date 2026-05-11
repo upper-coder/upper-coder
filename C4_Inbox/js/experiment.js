@@ -245,15 +245,33 @@ async startAfterIntro() {
         }
     }
 
-    /**
-     * Generate unique participant ID
+/**
+     * Generate unique participant ID (or capture from Prolific)
      */
     generateParticipantId() {
-        const timestamp = Date.now();
-        const random = Math.floor(Math.random() * 1000);
-        this.state.participantId = `P_${timestamp}_${random}`;
+        // Check for Prolific ID in URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const prolificId = urlParams.get('PROLIFIC_PID');
         
-        console.log('Participant ID:', this.state.participantId);
+        if (prolificId) {
+            // Use Prolific ID
+            this.state.participantId = prolificId;
+            this.state.isProlific = true;
+            
+            // Also capture study and session IDs if present
+            this.state.prolificStudyId = urlParams.get('STUDY_ID');
+            this.state.prolificSessionId = urlParams.get('SESSION_ID');
+            
+            console.log('Prolific participant:', prolificId);
+        } else {
+            // Generate random ID for non-Prolific participants
+            const timestamp = Date.now();
+            const random = Math.floor(Math.random() * 1000);
+            this.state.participantId = `P_${timestamp}_${random}`;
+            this.state.isProlific = false;
+            
+            console.log('Non-Prolific participant ID:', this.state.participantId);
+        }
     }
 
     /**

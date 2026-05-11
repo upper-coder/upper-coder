@@ -36,24 +36,33 @@ class ConsentForm {
             <h1 style="color: #2c3e50; margin-bottom: 20px; text-align: center;">Informed Consent</h1>
             
             <div style="margin-bottom: 30px; line-height: 1.6; color: #34495e;">
-                <h2 style="color: #2c3e50; font-size: 20px; margin-top: 30px;">Study Purpose</h2>
-                <p>[Placeholder text: This study investigates workplace experiences and decision-making...]</p>
+                <h2 style="color: #2c3e50; font-size: 20px; margin-top: 30px;">Protocol Director</h2>
+                <p>Valentino Chai, vechai@stanford.edu</p>
                 
                 <h2 style="color: #2c3e50; font-size: 20px; margin-top: 30px;">What You Will Do</h2>
-                <p>[Placeholder text: You will participate in a work simulation that will take approximately 30 minutes...]</p>
+                <p>If you decide to participate in this research study, you will be asked to complete an online workplace simulation and report your thoughts and feelings about the simulation.</p>
                 
                 <h2 style="color: #2c3e50; font-size: 20px; margin-top: 30px;">Risks and Benefits</h2>
-                <p>[Placeholder text: There are no anticipated risks beyond those encountered in daily life...]</p>
+                <p>This study poses no physical risks beyond those involved in normal, daily reading, writing, and computer tasks. There are no foreseeable psychological, social, or legal risks. We cannot and do not guarantee or promise that you will receive any benefits from this study.</p>
                 
-                <h2 style="color: #2c3e50; font-size: 20px; margin-top: 30px;">Confidentiality</h2>
-                <p>[Placeholder text: Your data will be kept confidential and stored securely...]</p>
+                <h2 style="color: #2c3e50; font-size: 20px; margin-top: 30px;">Time Involvement</h2>
+                <p>This study takes approximately 15 minutes to complete</p>
                 
-                <h2 style="color: #2c3e50; font-size: 20px; margin-top: 30px;">Voluntary Participation</h2>
-                <p>[Placeholder text: Your participation is completely voluntary. You may withdraw at any time...]</p>
+                <h2 style="color: #2c3e50; font-size: 20px; margin-top: 30px;">Payment</h2>
+                <p>You will receive $10 for completing this study. Participants who provide thoughtful responses will receive an additional bonus of $5.</p>
+                
+                <h2 style="color: #2c3e50; font-size: 20px; margin-top: 30px;">Subjects' Rights</h2>
+                <p>If you have read this form and have decided to participate in this project, please understand your participation is voluntary and you have the right to withdraw your consent or discontinue participation at any time without penalty. You have the right to refuse to answer particular questions. Your individual privacy will be maintained in all published and written data resulting from the study. You may withdraw your data from this study after participation, if you so choose.</p>
                 
                 <h2 style="color: #2c3e50; font-size: 20px; margin-top: 30px;">Contact Information</h2>
-                <p>[Placeholder text: If you have questions, please contact: researcher@university.edu]</p>
-            </div>
+           
+                <h3 style="color: #2c3e50; font-size: 20px; margin-top: 30px;">Questions, Concerns, or Complaints</h2>
+                <p>If you have any questions, concerns or complaints about this research study, its procedures, risks and benefits, please ask the Protocol Director, Valentino Chai, at vechai@stanford.edu, 650-613-9251.</p>
+                
+                <h3 style="color: #2c3e50; font-size: 20px; margin-top: 30px;">Independent Contact</h2>
+                <p>If you are not satisfied with how this study is being conducted, or if you have any concerns, complaints, or general questions about the research or your rights as a participant, please contact the Stanford Institutional Review Board (IRB) to speak to someone independent of the research team at 650-723-2480 or toll free at 1-866-680-2906.  You can also write to the Stanford IRB at irbnonmed@stanford.edu.</p>
+                
+                </div>
 
             <form id="consent-form" style="margin-top: 40px;">
                 <div style="background-color: #f8f9fa; padding: 25px; border-radius: 6px; border: 2px solid #dee2e6;">

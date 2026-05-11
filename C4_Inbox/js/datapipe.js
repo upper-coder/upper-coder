@@ -31,7 +31,10 @@ async exportData() {
         const trackingData = this.experiment.tracker ? this.experiment.tracker.getAllData() : {};
         
         const exportData = {
-            participantId: this.experiment.state.participantId,
+    participantId: this.experiment.state.participantId,
+    isProlific: this.experiment.state.isProlific || false,
+    prolificStudyId: this.experiment.state.prolificStudyId || null,
+    prolificSessionId: this.experiment.state.prolificSessionId || null,
             condition: this.experiment.state.condition,
             inconsistency: this.experiment.state.inconsistency,
             mindset: this.experiment.state.mindset,

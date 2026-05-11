@@ -524,9 +524,20 @@ class Survey {
 /**
  * Show final thank you page
  */
-showThankYou(success, errorMessage = null) {
-    // Prolific completion URL (placeholder for now)
-    const prolificCompletionURL = 'https://app.prolific.co/submissions/complete?cc=PLACEHOLDER_CODE';
+    showThankYou(success, errorMessage = null) {
+        // Build Prolific completion URL
+        let prolificCompletionURL = 'https://app.prolific.com/submissions/complete?cc=YOUR_COMPLETION_CODE';
+        
+        // If we have Prolific IDs, append them
+        if (this.experiment.state.isProlific) {
+            prolificCompletionURL += `&PROLIFIC_PID=${this.experiment.state.participantId}`;
+            if (this.experiment.state.prolificStudyId) {
+                prolificCompletionURL += `&STUDY_ID=${this.experiment.state.prolificStudyId}`;
+            }
+            if (this.experiment.state.prolificSessionId) {
+                prolificCompletionURL += `&SESSION_ID=${this.experiment.state.prolificSessionId}`;
+            }
+        }
     
     this.container.innerHTML = `
         <div style="text-align: center; padding: 60px 20px;">
