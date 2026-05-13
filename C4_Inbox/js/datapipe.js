@@ -32,10 +32,8 @@ async exportData() {
         
         const exportData = {
     participantId: this.experiment.state.participantId,
-    isProlific: this.experiment.state.isProlific || false,
-    prolificStudyId: this.experiment.state.prolificStudyId || null,
-    prolificSessionId: this.experiment.state.prolificSessionId || null,
-            condition: this.experiment.state.condition,
+    isSONA: this.experiment.state.isSONA || false,
+    condition: this.experiment.state.condition,
             inconsistency: this.experiment.state.inconsistency,
             mindset: this.experiment.state.mindset,
             startTime: this.experiment.state.startTime,

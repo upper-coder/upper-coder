@@ -525,82 +525,57 @@ class Survey {
  * Show final thank you page
  */
     showThankYou(success, errorMessage = null) {
-        // Build Prolific completion URL
-        let prolificCompletionURL = 'https://app.prolific.com/submissions/complete?cc=YOUR_COMPLETION_CODE';
+        // SONA return URL with experiment_id (change YOUR_EXPERIMENT_ID to your actual ID)
+        let sonaReturnURL = 'https://ubc-psych.sona-systems.com/webstudy_credit.aspx?experiment_id=YOUR_EXPERIMENT_ID&survey_code=';
         
-        // If we have Prolific IDs, append them
-        if (this.experiment.state.isProlific) {
-            prolificCompletionURL += `&PROLIFIC_PID=${this.experiment.state.participantId}`;
-            if (this.experiment.state.prolificStudyId) {
-                prolificCompletionURL += `&STUDY_ID=${this.experiment.state.prolificStudyId}`;
-            }
-            if (this.experiment.state.prolificSessionId) {
-                prolificCompletionURL += `&SESSION_ID=${this.experiment.state.prolificSessionId}`;
-            }
+        // Append SONA ID if available
+        if (this.experiment.state.isSONA && this.experiment.state.participantId) {
+            sonaReturnURL += this.experiment.state.participantId;
+        } else {
+            sonaReturnURL += 'NOSONA';
         }
-    
-    this.container.innerHTML = `
-        <div style="text-align: center; padding: 60px 20px;">
-            ${success ? `
-                <h1 style="color: #27ae60; margin-bottom: 20px;">✓ All Done!</h1>
-                <p style="font-size: 18px; line-height: 1.6; color: #34495e; margin-bottom: 30px;">
-                    Thank you for participating in this study! Your data has been successfully saved.
-                </p>
-                <p style="font-size: 16px; color: #7f8c8d; margin-bottom: 30px;">
-                    Click the button below to return to Prolific and receive your completion code.
-                </p>
-                <button id="prolific-return-btn" style="
-                    background-color: #3498db;
-                    color: white;
-                    border: none;
-                    padding: 15px 40px;
-                    font-size: 18px;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    margin-top: 20px;
-                ">Return to Prolific</button>
-            ` : `
-                <h1 style="color: #e74c3c; margin-bottom: 20px;">⚠ Data Save Issue</h1>
-                <p style="font-size: 18px; line-height: 1.6; color: #34495e; margin-bottom: 20px;">
-                    There was an issue saving your data to the server.
-                </p>
-                <p style="font-size: 14px; color: #7f8c8d; margin-bottom: 30px;">
-                    Error: ${errorMessage || 'Unknown error'}
-                </p>
-                <p style="font-size: 16px; color: #34495e; margin-bottom: 30px;">
-                    However, your data has been saved locally as a backup. 
-                    Please contact the researcher with your Prolific ID.
-                </p>
-                <button id="prolific-return-btn" style="
-                    background-color: #3498db;
-                    color: white;
-                    border: none;
-                    padding: 15px 40px;
-                    font-size: 18px;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    margin-top: 20px;
-                ">Return to Prolific</button>
-            `}
-            <div style="margin-top: 40px; padding: 20px; background-color: #f8f9fa; border-radius: 6px; max-width: 500px; margin-left: auto; margin-right: auto;">
-                <p style="font-weight: 600; color: #2c3e50; margin-bottom: 10px;">
-                    Study Information:
-                </p>
-                <p style="font-size: 14px; color: #7f8c8d;">
-                    Participant ID: ${this.experiment.state.participantId}<br>
-                    Condition: ${this.experiment.state.condition}<br>
-                    Completion Time: ${new Date().toLocaleString()}
-                </p>
-            </div>
-        </div>
-    `;
-    
-    // Add click handler for return button
-    const returnBtn = document.getElementById('prolific-return-btn');
-    if (returnBtn) {
-        returnBtn.addEventListener('click', () => {
-            window.location.href = prolificCompletionURL;
-        });
-    }
+        
+        const content = document.getElementById('survey-content');
+        
+        if (success) {
+            content.innerHTML = `
+                <div class="thank-you">
+                    <h2>Thank you for participating!</h2>
+                    <p>Your responses have been recorded successfully.</p>
+                    ${this.experiment.state.isSONA ? 
+                        `<p style="margin-top: 20px; padding: 15px; background-color: #e8f5e9; border-radius: 6px;">
+                            <strong>Your SONA ID:</strong> ${this.experiment.state.participantId}
+                        </p>` : ''}
+                    <p style="margin-top: 20px;">Payment will be processed separately through SONA.</p>
+                    <p>You will be redirected to SONA in <span id="redirect-countdown">5</span> seconds...</p>
+                    <p>If you are not redirected automatically, <a href="${sonaReturnURL}" id="manual-redirect">click here</a>.</p>
+                </div>
+            `;
+            
+            // Countdown and redirect
+            let countdown = 5;
+            const countdownElement = document.getElementById('redirect-countdown');
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                if (countdownElement) {
+                    countdownElement.textContent = countdown;
+                }
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    window.location.href = sonaReturnURL;
+                }
+            }, 1000);
+            
+        } else {
+            content.innerHTML = `
+                <div class="thank-you error">
+                    <h2>Submission Error</h2>
+                    <p>There was an error recording your responses:</p>
+                    <p style="color: #c0392b; font-weight: 606;">${errorMessage || 'Unknown error'}</p>
+                    <p>Please contact the researcher with your SONA ID: <strong>${this.experiment.state.participantId}</strong></p>
+                    <p style="margin-top: 20px;"><a href="${sonaReturnURL}">Return to SONA</a></p>
+                </div>
+            `;
+        }
     }
 }

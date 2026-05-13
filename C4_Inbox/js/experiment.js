@@ -246,31 +246,27 @@ async startAfterIntro() {
     }
 
 /**
-     * Generate unique participant ID (or capture from Prolific)
+     * Generate unique participant ID (or capture from SONA)
      */
     generateParticipantId() {
-        // Check for Prolific ID in URL parameters
+        // Check for SONA ID in URL parameters
         const urlParams = new URLSearchParams(window.location.search);
-        const prolificId = urlParams.get('PROLIFIC_PID');
+        const sonaId = urlParams.get('id');
         
-        if (prolificId) {
-            // Use Prolific ID
-            this.state.participantId = prolificId;
-            this.state.isProlific = true;
+        if (sonaId) {
+            // Use SONA ID
+            this.state.participantId = sonaId;
+            this.state.isSONA = true;
             
-            // Also capture study and session IDs if present
-            this.state.prolificStudyId = urlParams.get('STUDY_ID');
-            this.state.prolificSessionId = urlParams.get('SESSION_ID');
-            
-            console.log('Prolific participant:', prolificId);
+            console.log('SONA participant:', sonaId);
         } else {
-            // Generate random ID for non-Prolific participants
+            // Generate random ID for non-SONA participants
             const timestamp = Date.now();
             const random = Math.floor(Math.random() * 1000);
             this.state.participantId = `P_${timestamp}_${random}`;
-            this.state.isProlific = false;
+            this.state.isSONA = false;
             
-            console.log('Non-Prolific participant ID:', this.state.participantId);
+            console.log('Non-SONA participant ID:', this.state.participantId);
         }
     }
 
