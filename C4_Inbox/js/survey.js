@@ -518,12 +518,9 @@ class Survey {
         }
     }
 
-    /**
+     /**
      * Show final thank you page
      */
-/**
- * Show final thank you page
- */
     showThankYou(success, errorMessage = null) {
         // SONA return URL with experiment_id (change YOUR_EXPERIMENT_ID to your actual ID)
         let sonaReturnURL = 'https://ubc-psych.sona-systems.com/webstudy_credit.aspx?experiment_id=YOUR_EXPERIMENT_ID&survey_code=';
@@ -535,12 +532,10 @@ class Survey {
             sonaReturnURL += 'NOSONA';
         }
         
-        const content = document.getElementById('survey-content');
-        
         if (success) {
-            content.innerHTML = `
-                <div class="thank-you">
-                    <h2>Thank you for participating!</h2>
+            this.container.innerHTML = `
+                <div class="thank-you" style="text-align: center;">
+                    <h2 style="color: #27ae60;">Thank you for participating!</h2>
                     <p>Your responses have been recorded successfully.</p>
                     ${this.experiment.state.isSONA ? 
                         `<p style="margin-top: 20px; padding: 15px; background-color: #e8f5e9; border-radius: 6px;">
@@ -567,11 +562,11 @@ class Survey {
             }, 1000);
             
         } else {
-            content.innerHTML = `
-                <div class="thank-you error">
-                    <h2>Submission Error</h2>
+            this.container.innerHTML = `
+                <div class="thank-you error" style="text-align: center;">
+                    <h2 style="color: #c0392b;">Submission Error</h2>
                     <p>There was an error recording your responses:</p>
-                    <p style="color: #c0392b; font-weight: 606;">${errorMessage || 'Unknown error'}</p>
+                    <p style="color: #c0392b; font-weight: 600;">${errorMessage || 'Unknown error'}</p>
                     <p>Please contact the researcher with your SONA ID: <strong>${this.experiment.state.participantId}</strong></p>
                     <p style="margin-top: 20px;"><a href="${sonaReturnURL}">Return to SONA</a></p>
                 </div>
