@@ -7,7 +7,7 @@
 class Experiment {
     constructor() {
         this.state = {
-            phase: 'INIT', // INIT, CONSENT, INTRO, TUTORIAL, FREE_PLAY, COMPLETE
+            phase: 'INIT',
             condition: null,
             inconsistency: null,
             mindset: null,
@@ -25,7 +25,7 @@ class Experiment {
         
         // Component references (initialized later)
         this.consentForm = null;
-        this.introPages = null; // TODO: Will be implemented later
+        this.introPages = null;
         this.clock = null;
         this.emailSystem = null;
         this.taskSystem = null;
@@ -50,6 +50,37 @@ class Experiment {
         
         // Counter for balanced assignment (stored in localStorage)
         this.conditionCounterKey = 'experiment_condition_counter';
+    }
+
+    /**
+     * Play email notification sound
+     */
+    playNotificationSound() {
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Set frequency (higher = higher pitch)
+            oscillator.frequency.value = 800; // Nice pleasant "ding" frequency
+            oscillator.type = 'sine'; // Smooth tone
+            
+            // Volume envelope (fade in/out for smoother sound)
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            // Play for 0.5 seconds
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+            
+            console.log('Notification sound played');
+        } catch (error) {
+            console.error('Error playing notification sound:', error);
+        }
     }
 
     /**

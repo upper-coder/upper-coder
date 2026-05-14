@@ -158,6 +158,11 @@ deliverInitialEmails() {
             return;
         }
 
+        // Play notification sound
+    if (this.experiment && this.experiment.playNotificationSound) {
+        this.experiment.playNotificationSound();
+    }
+
 // Initialize state
 this.emailStates[emailId] = {
     delivered: true,
