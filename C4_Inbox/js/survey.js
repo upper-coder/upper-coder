@@ -523,7 +523,7 @@ class Survey {
      */
     showThankYou(success, errorMessage = null) {
         // SONA return URL with experiment_id (change YOUR_EXPERIMENT_ID to your actual ID)
-        let sonaReturnURL = 'https://ubc-psych.sona-systems.com/webstudy_credit.aspx?experiment_id=YOUR_EXPERIMENT_ID&survey_code=';
+        let sonaReturnURL = 'https://sgsb.sona-systems.com/webstudy_credit.aspx?experiment_id=1505&credit_token=fc790a2b32aa44b0b28d39f8ef642991&survey_code=${e://Field/id}';
         
         // Append SONA ID if available
         if (this.experiment.state.isSONA && this.experiment.state.participantId) {
