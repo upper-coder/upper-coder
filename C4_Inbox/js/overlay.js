@@ -884,17 +884,34 @@ class Overlay {
     /**
      * Load work tasks (for helping coworker)
      */
+    /**
+     * Load work tasks (for helping coworker)
+     */
     loadWorkTasks(data) {
         const isHelping = data.isHelping || false;
         
         console.log('loadWorkTasks called with isHelping:', isHelping);
+        
+        // Get current help stats BEFORE rendering HTML
+        let helpStatsText = 'Routes completed for Alex: 0';
+        if (isHelping && this.experiment.taskSystem && this.experiment.tracker) {
+            const helpCount = this.experiment.taskSystem.getHelpTaskCount();
+            const helpData = this.experiment.tracker.helpTasks;
+            const avgEfficiency = helpData.completed > 0 
+                ? Math.round((helpData.totalEfficiency / helpData.completed) * 100)
+                : 0;
+            
+            if (helpCount > 0) {
+                helpStatsText = `Routes completed for Alex: ${helpCount} (Avg: ${avgEfficiency}%)`;
+            }
+        }
         
         this.bodyElement.innerHTML = `
             <h2>${isHelping ? "Help Alex Martinez" : "Your Tasks"}</h2>
             <p>${isHelping ? "Complete delivery routes to help Alex meet their deadline." : "Complete your assigned tasks."}</p>
             ${isHelping ? `
                 <div class="help-stats">
-                    <span id="help-completed-count">Routes completed for Alex: 0</span>
+                    <span id="help-completed-count">${helpStatsText}</span>
                 </div>
             ` : ''}
             <div id="overlay-task-container" style="width: 100%; position: relative;">
@@ -925,16 +942,38 @@ class Overlay {
     /**
      * Load Jira bug assignment system
      */
+
     loadJiraSystem(data) {
-        // Default bug data
-        const bugData = {
-            participant: 12,
-            teammates: [
-                { name: 'Alex Martinez', bugs: 8 },
-                { name: 'Jordan Lee', bugs: 6 },
-                { name: 'Sam Chen', bugs: 7 }
-            ]
-        };
+        // Check if we have existing Jira state (from previous session)
+        let participantBugs = 12;
+        let teammates = [
+            { name: 'Alex Martinez', bugs: 8 },
+            { name: 'Jordan Lee', bugs: 6 },
+            { name: 'Sam Chen', bugs: 7 }
+        ];
+        let reassignments = [];
+        
+        // If Jira was opened before, restore the state
+        if (this.jiraState) {
+            participantBugs = this.jiraState.getParticipantBugs();
+            reassignments = this.jiraState.reassignments;
+            
+            // Recalculate teammate bug counts based on reassignments
+            reassignments.forEach(reassignment => {
+                const teammate = teammates.find(t => t.name === reassignment.to);
+                if (teammate) {
+                    teammate.bugs += reassignment.count;
+                }
+            });
+            
+            console.log('Restored Jira state:', {
+                participantBugs,
+                teammates,
+                reassignments: reassignments.length
+            });
+        } else {
+            console.log('First time opening Jira, using defaults');
+        }
         
         this.bodyElement.innerHTML = `
             <h2>Bug Tracking System</h2>
@@ -947,10 +986,10 @@ class Overlay {
                         <div>
                             <div class="bug-user">You</div>
                         </div>
-                        <div class="bug-count" id="participant-bug-count">12</div>
+                        <div class="bug-count" id="participant-bug-count">${participantBugs}</div>
                     </div>
                     
-                    ${bugData.teammates.map(teammate => `
+                    ${teammates.map(teammate => `
                         <div class="bug-item">
                             <div class="bug-user">${teammate.name}</div>
                             <div class="bug-count teammate-bugs" data-name="${teammate.name}">${teammate.bugs}</div>
@@ -965,13 +1004,13 @@ class Overlay {
                     <div style="display: flex; gap: 15px; align-items: center; margin-top: 15px;">
                         <label>Reassign to:</label>
                         <select id="reassign-to" style="padding: 8px; border-radius: 4px; border: 2px solid #bdc3c7;">
-                            ${bugData.teammates.map(teammate => 
+                            ${teammates.map(teammate => 
                                 `<option value="${teammate.name}">${teammate.name}</option>`
                             ).join('')}
                         </select>
                         
                         <label>Number of bugs:</label>
-                        <input type="number" id="reassign-count" min="1" max="12" value="1" 
+                        <input type="number" id="reassign-count" min="1" max="${participantBugs}" value="1" 
                                style="width: 80px; padding: 8px; border-radius: 4px; border: 2px solid #bdc3c7;">
                         
                         <button id="reassign-btn" class="bug-reassign-btn" style="padding: 8px 20px;">
@@ -990,9 +1029,15 @@ class Overlay {
         // Show close button
         this.closeButton.style.display = 'block';
         
-        // Track bugs
-        let participantBugs = bugData.participant;
-        const reassignments = [];
+        // Update Jira state (or create if first time)
+        if (!this.jiraState) {
+            this.jiraState = {
+                participantBugs: participantBugs,
+                actualBugs: 12, // Original starting count
+                reassignments: reassignments,
+                getParticipantBugs: () => this.jiraState.participantBugs
+            };
+        }
         
         // Add reassign button handler
         const reassignBtn = document.getElementById('reassign-btn');
@@ -1000,8 +1045,8 @@ class Overlay {
             const toName = document.getElementById('reassign-to').value;
             const count = parseInt(document.getElementById('reassign-count').value);
             
-            if (count > participantBugs) {
-                alert(`You only have ${participantBugs} bugs to reassign.`);
+            if (count > this.jiraState.participantBugs) {
+                alert(`You only have ${this.jiraState.participantBugs} bugs to reassign.`);
                 return;
             }
             
@@ -1011,8 +1056,11 @@ class Overlay {
             }
             
             // Update counts
-            participantBugs -= count;
-            document.getElementById('participant-bug-count').textContent = participantBugs;
+            this.jiraState.participantBugs -= count;
+            document.getElementById('participant-bug-count').textContent = this.jiraState.participantBugs;
+            
+            // Update max value for input
+            document.getElementById('reassign-count').max = this.jiraState.participantBugs;
             
             // Update teammate count
             const teammateElement = document.querySelector(`[data-name="${toName}"]`);
@@ -1022,7 +1070,7 @@ class Overlay {
             }
             
             // Track reassignment
-            reassignments.push({
+            this.jiraState.reassignments.push({
                 to: toName,
                 count: count,
                 timestamp: Date.now()
@@ -1033,18 +1081,10 @@ class Overlay {
                 this.experiment.tracker.recordBugReassignment('You', toName, count);
             }
             
-            console.log(`Reassigned ${count} bugs to ${toName}. You now have ${participantBugs} bugs.`);
+            console.log(`Reassigned ${count} bugs to ${toName}. You now have ${this.jiraState.participantBugs} bugs.`);
             
             alert(`Successfully reassigned ${count} bug(s) to ${toName}.`);
         });
-        
-        // Store Jira state for later retrieval
-        this.jiraState = {
-            participantBugs: participantBugs,
-            actualBugs: bugData.participant,
-            reassignments: reassignments,
-            getParticipantBugs: () => participantBugs
-        };
     }
 
     /**

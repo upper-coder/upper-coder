@@ -314,11 +314,61 @@ class Tracker {
         return Math.round((this.tabTimes[tab] / totalTime) * 100);
     }
 
+/**
+     * Calculate bug reassignment summary from events
+     */
+    calculateBugReassignmentSummary() {
+        // Get all bug reassignment events
+        const reassignmentEvents = this.events.filter(e => e.type === 'bugs_reassigned');
+        
+        // Calculate totals
+        const totalBugsReassigned = reassignmentEvents.reduce((sum, event) => {
+            return sum + (event.data.count || 0);
+        }, 0);
+        
+        // Calculate breakdown by teammate
+        const byTeammate = {};
+        reassignmentEvents.forEach(event => {
+            const to = event.data.to;
+            const count = event.data.count || 0;
+            
+            if (byTeammate[to]) {
+                byTeammate[to] += count;
+            } else {
+                byTeammate[to] = count;
+            }
+        });
+        
+        // Get final bug count from Jira state (if available)
+        let finalBugCount = 12; // Default starting value
+        let actualBugs = 12;
+        
+        if (this.experiment.overlay && this.experiment.overlay.jiraState) {
+            finalBugCount = this.experiment.overlay.jiraState.getParticipantBugs();
+            actualBugs = this.experiment.overlay.jiraState.actualBugs;
+        }
+        
+        return {
+            totalBugsReassigned: totalBugsReassigned,
+            numberOfReassignments: reassignmentEvents.length,
+            finalBugCount: finalBugCount,
+            startingBugCount: actualBugs,
+            byTeammate: byTeammate,
+            individualEvents: reassignmentEvents.map(e => ({
+                to: e.data.to,
+                count: e.data.count,
+                timestamp: e.timestamp
+            }))
+        };
+    }
     /**
      * Get all tracking data for export
      */
     getAllData() {
         const summary = this.calculateSummaryStats();
+        
+        // Calculate bug reassignment summary from events
+        const bugReassignmentSummary = this.calculateBugReassignmentSummary();
         
         return {
             // Summary statistics
@@ -348,6 +398,9 @@ class Tracker {
             
             // Email interactions
             emailInteractions: this.emailInteractions,
+            
+            // Bug reassignment summary
+            bugReassignments: bugReassignmentSummary,
             
             // Time allocation
             tabTimes: {
