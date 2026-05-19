@@ -521,16 +521,19 @@ class Survey {
      /**
      * Show final thank you page
      */
+    /**
+     * Show final thank you page
+     */
     showThankYou(success, errorMessage = null) {
-        // SONA return URL with experiment_id (change YOUR_EXPERIMENT_ID to your actual ID)
-        let sonaReturnURL = 'https://sgsb.sona-systems.com/webstudy_credit.aspx?experiment_id=1505&credit_token=fc790a2b32aa44b0b28d39f8ef642991&survey_code=XXXX';
+        // Get SONA ID from URL
+        const id = new URLSearchParams(window.location.search).get("id");
         
-        // Append SONA ID if available
-        if (this.experiment.state.isSONA && this.experiment.state.participantId) {
-            sonaReturnURL += this.experiment.state.participantId;
-        } else {
-            sonaReturnURL += 'NOSONA';
-        }
+        // Build SONA completion URL with credit token
+        const sonaReturnURL = 
+            "https://sgsb.sona-systems.com/webstudy_credit.aspx" +
+            "?experiment_id=1505" +
+            "&credit_token=fc790a2b32aa44b0b28d39f8ef642991" +
+            "&survey_code=" + encodeURIComponent(id || 'NOSONA');
         
         if (success) {
             this.container.innerHTML = `
@@ -541,8 +544,7 @@ class Survey {
                         `<p style="margin-top: 20px; padding: 15px; background-color: #e8f5e9; border-radius: 6px;">
                             <strong>Your SONA ID:</strong> ${this.experiment.state.participantId}
                         </p>` : ''}
-                    <p style="margin-top: 20px;">Payment will be processed separately through SONA.</p>
-                    <p>You will be redirected to SONA in <span id="redirect-countdown">5</span> seconds...</p>
+                    <p style="margin-top: 20px;">You will be redirected to SONA to receive credit in <span id="redirect-countdown">5</span> seconds...</p>
                     <p>If you are not redirected automatically, <a href="${sonaReturnURL}" id="manual-redirect">click here</a>.</p>
                 </div>
             `;
