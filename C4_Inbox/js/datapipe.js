@@ -18,7 +18,6 @@ class DataPipe {
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         return `${participantId}_${timestamp}.json`;
     }
-
     /**
      * Export data to DataPipe
      */
