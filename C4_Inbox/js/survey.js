@@ -518,13 +518,60 @@ class Survey {
         }
     }
 
+/**
+ * Show final thank you page
+ */
+showThankYou(success, errorMessage = null) {
+    // Prolific completion URL - REPLACE WITH YOUR ACTUAL COMPLETION CODE
+    const prolificCompletionURL = 'https://app.prolific.com/submissions/complete?cc=YOUR_COMPLETION_CODE';
+    
+    if (success) {
+        this.container.innerHTML = `
+            <div class="thank-you" style="text-align: center;">
+                <h2 style="color: #27ae60;">Thank you for participating!</h2>
+                <p>Your responses have been recorded successfully.</p>
+                ${this.experiment.state.isProlific ? 
+                    `<p style="margin-top: 20px; padding: 15px; background-color: #e8f5e9; border-radius: 6px;">
+                        <strong>Your Prolific ID:</strong> ${this.experiment.state.participantId}
+                    </p>` : ''}
+                <p style="margin-top: 20px;">You will be redirected to Prolific in <span id="redirect-countdown">5</span> seconds...</p>
+                <p>If you are not redirected automatically, <a href="${prolificCompletionURL}" id="manual-redirect">click here</a>.</p>
+            </div>
+        `;
+        
+        // Countdown and redirect
+        let countdown = 5;
+        const countdownElement = document.getElementById('redirect-countdown');
+        const countdownInterval = setInterval(() => {
+            countdown--;
+            if (countdownElement) {
+                countdownElement.textContent = countdown;
+            }
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+                window.location.href = prolificCompletionURL;
+            }
+        }, 1000);
+        
+    } else {
+        this.container.innerHTML = `
+            <div class="thank-you error" style="text-align: center;">
+                <h2 style="color: #c0392b;">Submission Error</h2>
+                <p>There was an error recording your responses:</p>
+                <p style="color: #c0392b; font-weight: 600;">${errorMessage || 'Unknown error'}</p>
+                <p>Please contact the researcher with your Prolific ID: <strong>${this.experiment.state.participantId}</strong></p>
+                <p style="margin-top: 20px;"><a href="${prolificCompletionURL}">Return to Prolific</a></p>
+            </div>
+        `;
+    }
+}
+
      /**
-     * Show final thank you page
+     * Show final thank you page if SONA
      */
-    /**
-     * Show final thank you page
-     */
-    showThankYou(success, errorMessage = null) {
+
+/**    
+ *  showThankYou(success, errorMessage = null) {
         // Get SONA ID from URL
         const id = new URLSearchParams(window.location.search).get("id");
         
@@ -575,4 +622,6 @@ class Survey {
             `;
         }
     }
+*/
+
 }

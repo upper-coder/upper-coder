@@ -30,9 +30,11 @@ async exportData() {
         // Get all experiment data
         const trackingData = this.experiment.tracker ? this.experiment.tracker.getAllData() : {};
         
-        const exportData = {
+       const exportData = {
     participantId: this.experiment.state.participantId,
-    isSONA: this.experiment.state.isSONA || false,
+    isProlific: this.experiment.state.isProlific || false,  // CHANGED
+    prolificStudyId: this.experiment.state.prolificStudyId || null,  // ADDED
+    prolificSessionId: this.experiment.state.prolificSessionId || null,  // ADDED
     condition: this.experiment.state.condition,
             inconsistency: this.experiment.state.inconsistency,
             mindset: this.experiment.state.mindset,

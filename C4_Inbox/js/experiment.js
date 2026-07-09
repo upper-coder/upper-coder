@@ -248,24 +248,17 @@ async startAfterIntro() {
         });
     }
 
-    /**
-     * Get balanced condition assignment
-     * Uses round-robin to ensure equal distribution across conditions
-     */
-    getBalancedCondition() {
-        // Get current counter from localStorage
-        let counter = parseInt(localStorage.getItem(this.conditionCounterKey) || '0');
-        
-        // Assign condition based on counter
-        const conditionIndex = counter % this.conditionList.length;
-        const assignedCondition = this.conditionList[conditionIndex];
-        
-        // Increment and save counter
-        counter++;
-        localStorage.setItem(this.conditionCounterKey, counter.toString());
-        
-        return assignedCondition;
-    }
+ /* Get balanced condition assignment using true randomization
+ */
+getBalancedCondition() {
+    // True random assignment across all 8 conditions
+    const randomIndex = Math.floor(Math.random() * this.conditionList.length);
+    const assignedCondition = this.conditionList[randomIndex];
+    
+    console.log('Random condition assigned:', assignedCondition);
+    
+    return assignedCondition;
+}
 
     /**
      * Parse condition string into factors
@@ -292,30 +285,35 @@ async startAfterIntro() {
         }
     }
 
-/**
-     * Generate unique participant ID (or capture from SONA)
-     */
-    generateParticipantId() {
-        // Check for SONA ID in URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const sonaId = urlParams.get('id');
+     
+   /**
+ * Generate unique participant ID (or capture from Prolific)
+ */
+generateParticipantId() {
+    // Check for Prolific ID in URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const prolificId = urlParams.get('PROLIFIC_PID');
+    
+    if (prolificId) {
+        // Use Prolific ID
+        this.state.participantId = prolificId;
+        this.state.isProlific = true;
         
-        if (sonaId) {
-            // Use SONA ID
-            this.state.participantId = sonaId;
-            this.state.isSONA = true;
-            
-            console.log('SONA participant:', sonaId);
-        } else {
-            // Generate random ID for non-SONA participants
-            const timestamp = Date.now();
-            const random = Math.floor(Math.random() * 1000);
-            this.state.participantId = `P_${timestamp}_${random}`;
-            this.state.isSONA = false;
-            
-            console.log('Non-SONA participant ID:', this.state.participantId);
-        }
+        // Also capture study and session IDs
+        this.state.prolificStudyId = urlParams.get('STUDY_ID');
+        this.state.prolificSessionId = urlParams.get('SESSION_ID');
+        
+        console.log('Prolific participant:', prolificId);
+    } else {
+        // Generate random ID for non-Prolific participants
+        const timestamp = Date.now();
+        const random = Math.floor(Math.random() * 1000);
+        this.state.participantId = `P_${timestamp}_${random}`;
+        this.state.isProlific = false;
+        
+        console.log('Non-Prolific participant ID:', this.state.participantId);
     }
+}
 
     /**
      * Start tutorial phase
