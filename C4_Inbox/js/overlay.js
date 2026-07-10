@@ -439,17 +439,20 @@ class Overlay {
                         <div style="font-size: 12px; color: #7f8c8d; margin-top: 5px;">
                             Character count: <span class="char-count" data-target="pair3_reflection">0</span> / 100 minimum
                         </div>
-                    </div>
-                    
-                    <div class="bonus-reminder" style="background-color: #d4edda; border-left: 4px solid #28a745; 
+                    </div>                    
+                    <button type="submit" class="submit-btn" style="margin-top: 30px;">Continue</button>
+                </form>
+            `;
+
+        /**Move to above button type submit if want this
+         *                 <div class="bonus-reminder" style="background-color: #d4edda; border-left: 4px solid #28a745; 
                                                        padding: 15px 20px; border-radius: 6px; margin-top: 20px; 
                                                        font-weight: 600; color: #155724;">
                         💰 Participants who provide thoughtful and reflective responses receive a $5 bonus!
                     </div>
-                    
-                    <button type="submit" class="submit-btn" style="margin-top: 30px;">Continue</button>
-                </form>
-            `;
+ 
+ */
+
         } else {
             // CONTROL CONDITION
             this.bodyElement.innerHTML = `
@@ -520,17 +523,20 @@ class Overlay {
                         </div>
                     </div>
                     
-                    <div class="bonus-reminder" style="background-color: #d4edda; border-left: 4px solid #28a745; 
-                                                       padding: 15px 20px; border-radius: 6px; margin-top: 20px; 
-                                                       font-weight: 600; color: #155724;">
-                        💰 Participants who provide thoughtful and reflective responses receive a $5 bonus!
-                    </div>
+                    
                     
                     <button type="submit" class="submit-btn" style="margin-top: 30px;">Continue</button>
                 </form>
             `;
         }
-        
+                /**Move to above button type submit if want this
+         *                 <div class="bonus-reminder" style="background-color: #d4edda; border-left: 4px solid #28a745; 
+                                                       padding: 15px 20px; border-radius: 6px; margin-top: 20px; 
+                                                       font-weight: 600; color: #155724;">
+                        💰 Participants who provide thoughtful and reflective responses receive a $5 bonus!
+                    </div>
+ 
+ */
         // Set up character counters for all textareas
         this.setupCharacterCounters();
         
@@ -686,15 +692,20 @@ class Overlay {
                         Character count: <span class="char-count" data-target="org_reflection">0</span> / 100 minimum
                     </div>
                     
-                    <div class="bonus-reminder" style="background-color: #d4edda; border-left: 4px solid #28a745; 
-                                                       padding: 15px 20px; border-radius: 6px; margin-top: 20px; 
-                                                       font-weight: 600; color: #155724;">
-                        💰 Participants who provide thoughtful and reflective responses receive a $5 bonus!
-                    </div>
+                    
                     
                     <button type="submit" class="submit-btn" style="margin-top: 30px;">Continue</button>
                 </form>
             `;
+
+                    /**Move to above button type submit if want this
+         *                 <div class="bonus-reminder" style="background-color: #d4edda; border-left: 4px solid #28a745; 
+                                                       padding: 15px 20px; border-radius: 6px; margin-top: 20px; 
+                                                       font-weight: 600; color: #155724;">
+                        💰 Participants who provide thoughtful and reflective responses receive a $5 bonus!
+                    </div>
+ 
+ */
         } else {
             // CONTROL CONDITION
             this.bodyElement.innerHTML = `
@@ -721,15 +732,19 @@ class Overlay {
                         Character count: <span class="char-count" data-target="org_reflection">0</span> / 100 minimum
                     </div>
                     
-                    <div class="bonus-reminder" style="background-color: #d4edda; border-left: 4px solid #28a745; 
-                                                       padding: 15px 20px; border-radius: 6px; margin-top: 20px; 
-                                                       font-weight: 600; color: #155724;">
-                        💰 Participants who provide thoughtful and reflective responses receive a $5 bonus!
-                    </div>
+                   
                     
                     <button type="submit" class="submit-btn" style="margin-top: 30px;">Continue</button>
                 </form>
             `;
+                    /**Move to above button type submit if want this
+         *                 <div class="bonus-reminder" style="background-color: #d4edda; border-left: 4px solid #28a745; 
+                                                       padding: 15px 20px; border-radius: 6px; margin-top: 20px; 
+                                                       font-weight: 600; color: #155724;">
+                        💰 Participants who provide thoughtful and reflective responses receive a $5 bonus!
+                    </div>
+ 
+ */
         }
         
         // Set up character counter

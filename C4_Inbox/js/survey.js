@@ -119,6 +119,73 @@ class Survey {
                     }
                 ]
             },
+
+// ===== ADD ATTENTION CHECKS HERE =====
+        {
+            id: 'attention_check_1',
+            title: ' ',
+            randomize: false,
+            items: [
+                {
+                    id: 'attn_check_1',
+                    question: 'Across each step, the robot moves with the same speed and trajectory. Where is it most likely that the robot will be located on Step 4?',
+                    type: 'image_mc',
+                    imageUrl: 'images/Robot.png',
+                    imageQuestion: 'Across each step, the robot moves with the same speed and trajectory. Where is it most likely that the robot will be located on Step 4?',  // Customize this
+                    options: [
+                        { value: 'Mostly at the bottom right of the square', label: 'Mostly at the bottom right of the square' },
+                        { value: 'Mostly at the bottom left of the square', label: 'Mostly at the bottom left of the square' },
+                        { value: 'Mostly at the upper right of the square', label: 'Mostly at the upper right of the square' },
+                        { value: 'Mostly at the upper left of the square', label: 'Mostly at the upper left of the square' },
+                        { value: 'Mostly around the center of the square', label: 'Mostly around the center of the square' },
+                        { value: 'Off-screen (outside the square)', label: 'Off-screen (outside the square)' }
+                    ],
+                    correctAnswer: 'Mostly around the center of the square',  // Specify correct answer
+                    required: true
+                }
+            ]
+        },
+        {
+            id: 'attention_check_2',
+            title: ' ',
+            randomize: false,
+            items: [
+                {
+                    id: 'attn_check_2',
+                    question: 'Which is longer, the blue line or the red line?',
+                    type: 'image_mc',
+                    imageUrl: 'images/Lines.png',
+                    imageQuestion: 'Which is longer, the blue line or the red line?',  // Customize this
+                    options: [
+                        { value: 'blue line', label: 'blue line' },
+                        { value: 'neither, they are the same size', label: 'neither, they are the same size' },
+                        { value: 'red line', label: 'red line' }
+                    ],
+                    correctAnswer: 'blue line',  // Specify correct answer
+                    required: true
+                }
+            ]
+        },
+        {
+            id: 'attention_check_3',
+            title: 'Attention Check',
+            randomize: false,
+            items: [
+                {
+                    id: 'attn_check_3',
+                    question: 'Please drag ONLY the cooking ingredients to the box below.',
+                    type: 'drag_sort',
+                    dragItems: [
+                        { id: 'flour', label: 'Flour', isIngredient: true },
+                        { id: 'hammer', label: 'Hammer', isIngredient: false },
+                        { id: 'sugar', label: 'Sugar', isIngredient: true },
+                        { id: 'wrench', label: 'Wrench', isIngredient: false }
+                    ],
+                    required: true
+                }
+            ]
+        },
+
             {
                 id: 'demographics',
                 title: 'Background Information',
@@ -165,24 +232,39 @@ class Survey {
 /**
      * Randomize block order (except demographics, which stays last)
      */
-    randomizeBlocks() {
-        const demographics = this.blocks.pop();
-        
-        for (let i = this.blocks.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [this.blocks[i], this.blocks[j]] = [this.blocks[j], this.blocks[i]];
-        }
-        
-        this.blocks.forEach(block => {
-            if (block.randomize) {
-                this.shuffleArray(block.items);
-            }
-        });
-        
-        this.blocks.push(demographics);
-        
-        console.log('Survey blocks randomized. Order:', this.blocks.map(b => b.id));
+/**
+ * Randomize block order (keep attention checks first, demographics last)
+ */
+randomizeBlocks() {
+    // Remove attention checks (should stay first)
+    const attentionChecks = this.blocks.filter(b => b.id.startsWith('attention_check'));
+    
+    // Remove demographics (should stay last)
+    const demographics = this.blocks.find(b => b.id === 'demographics');
+    
+    // Get remaining blocks (psych measures)
+    const psychBlocks = this.blocks.filter(b => 
+        !b.id.startsWith('attention_check') && b.id !== 'demographics'
+    );
+    
+    // Randomize only the psych blocks
+    for (let i = psychBlocks.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [psychBlocks[i], psychBlocks[j]] = [psychBlocks[j], psychBlocks[i]];
     }
+    
+    // Randomize items within each psych block
+    psychBlocks.forEach(block => {
+        if (block.randomize) {
+            this.shuffleArray(block.items);
+        }
+    });
+    
+    // Reconstruct: attention checks → randomized psych → demographics
+    this.blocks = [...attentionChecks, ...psychBlocks, demographics];
+    
+    console.log('Survey blocks order:', this.blocks.map(b => b.id));
+}
 
     /**
      * Shuffle array in place
@@ -297,6 +379,7 @@ class Survey {
         });
         
         this.setupOtherTextFields();
+        this.setupDragAndDrop();  // ADD THIS LINE
     }
 
     /**
@@ -331,7 +414,76 @@ class Survey {
                 </div>
             `;
             
-        } else if (item.type === 'text') {
+        } else if (item.type === 'image_mc') {
+        // NEW: Image-based multiple choice
+        html += `
+            <p style="font-weight: 600; color: #2c3e50; margin-bottom: 15px;">
+                ${item.question}
+            </p>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="${item.imageUrl}" alt="Attention check image" 
+                     style="max-width: 100%; max-height: 400px; border: 2px solid #bdc3c7; border-radius: 8px;">
+            </div>
+            
+            <p style="font-weight: 600; color: #2c3e50; margin: 20px 0 15px 0;">
+                ${item.imageQuestion}
+            </p>
+        `;
+        
+        item.options.forEach(option => {
+            html += `
+                <div style="margin-bottom: 10px;">
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="radio" name="${item.id}" value="${option.value}" 
+                               ${item.required ? 'required' : ''} 
+                               data-correct="${item.correctAnswer}"
+                               style="margin-right: 10px; cursor: pointer;">
+                        <span style="color: #34495e;">${option.label}</span>
+                    </label>
+                </div>
+            `;
+        });
+        
+    } else if (item.type === 'drag_sort') {
+        // NEW: Drag and drop
+        html += `
+            <p style="font-weight: 600; color: #2c3e50; margin-bottom: 15px;">
+                ${item.question}
+            </p>
+            
+            <div style="display: flex; gap: 20px; margin-top: 20px;">
+                <div style="flex: 1;">
+                    <p style="font-weight: 600; margin-bottom: 10px;">Available items:</p>
+                    <div id="drag-source-${item.id}" class="drag-container" 
+                         style="min-height: 200px; padding: 15px; border: 2px solid #bdc3c7; 
+                                border-radius: 6px; background-color: #f8f9fa;">
+                        ${item.dragItems.map(dragItem => `
+                            <div class="drag-item" draggable="true" 
+                                 data-id="${dragItem.id}" 
+                                 data-is-ingredient="${dragItem.isIngredient}"
+                                 style="padding: 10px 15px; margin: 5px 0; background-color: white; 
+                                        border: 2px solid #3498db; border-radius: 4px; cursor: move;
+                                        user-select: none;">
+                                ${dragItem.label}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div style="flex: 1;">
+                    <p style="font-weight: 600; margin-bottom: 10px;">Cooking ingredients (drag here):</p>
+                    <div id="drag-target-${item.id}" class="drag-container" 
+                         style="min-height: 200px; padding: 15px; border: 2px dashed #27ae60; 
+                                border-radius: 6px; background-color: #e8f5e9;">
+                    </div>
+                </div>
+            </div>
+            
+            <input type="hidden" name="${item.id}" id="drag-result-${item.id}" required>
+        `;
+        
+            }else if (item.type === 'text') {
             html += `
                 <label style="display: block; font-weight: 600; color: #2c3e50; margin-bottom: 10px;">
                     ${item.question}
@@ -422,31 +574,101 @@ class Survey {
         });
     }
 
-    /**
-     * Submit current block and move to next
-     */
-    submitBlock(block, blockIndex) {
-        const formData = new FormData(document.getElementById('survey-form'));
+/**
+ * Setup drag and drop for attention checks
+ */
+setupDragAndDrop() {
+    const dragItems = document.querySelectorAll('.drag-item');
+    const dragContainers = document.querySelectorAll('.drag-container');
+    
+    let draggedElement = null;
+    
+    dragItems.forEach(item => {
+        item.addEventListener('dragstart', (e) => {
+            draggedElement = e.target;
+            e.target.style.opacity = '0.5';
+        });
         
-        // Collect responses for this block
-        const blockResponses = {};
+        item.addEventListener('dragend', (e) => {
+            e.target.style.opacity = '1';
+        });
+    });
+    
+    dragContainers.forEach(container => {
+        container.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            container.style.backgroundColor = container.id.includes('target') ? '#d4edda' : '#e3f2fd';
+        });
         
-        block.items.forEach(item => {
-            const value = formData.get(item.id);
-            blockResponses[item.id] = {
-                question: item.question,
-                value: value,
-                type: item.type
-            };
+        container.addEventListener('dragleave', (e) => {
+            container.style.backgroundColor = container.id.includes('target') ? '#e8f5e9' : '#f8f9fa';
+        });
+        
+        container.addEventListener('drop', (e) => {
+            e.preventDefault();
+            container.style.backgroundColor = container.id.includes('target') ? '#e8f5e9' : '#f8f9fa';
             
-            // If this is a radio with "other" option, check for text
-            if (item.type === 'radio') {
-                const otherText = formData.get(`${item.id}_other_text`);
-                if (otherText) {
-                    blockResponses[item.id].otherText = otherText;
+            if (draggedElement) {
+                container.appendChild(draggedElement);
+                
+                // Update hidden field with current state
+                if (container.id.includes('target')) {
+                    const targetId = container.id.replace('drag-target-', '');
+                    const itemsInTarget = Array.from(container.querySelectorAll('.drag-item'))
+                        .map(item => item.dataset.id);
+                    document.getElementById(`drag-result-${targetId}`).value = itemsInTarget.join(',');
                 }
             }
         });
+    });
+}
+
+    /**
+     * Submit current block and move to next
+     */
+   submitBlock(block, blockIndex) {
+    const formData = new FormData(document.getElementById('survey-form'));
+    
+    // Collect responses for this block
+    const blockResponses = {};
+    
+    block.items.forEach(item => {
+        const value = formData.get(item.id);
+        blockResponses[item.id] = {
+            question: item.question,
+            value: value,
+            type: item.type
+        };
+        
+        // Record correctness for attention checks
+        if (item.type === 'image_mc') {
+            blockResponses[item.id].correct = (value === item.correctAnswer);
+            blockResponses[item.id].correctAnswer = item.correctAnswer;
+        }
+        
+        if (item.type === 'drag_sort') {
+            const selectedItems = value ? value.split(',') : [];
+            const correctItems = item.dragItems
+                .filter(di => di.isIngredient)
+                .map(di => di.id);
+            
+            // Check if they selected exactly the right items
+            const isCorrect = selectedItems.length === correctItems.length &&
+                            selectedItems.every(id => correctItems.includes(id));
+            
+            blockResponses[item.id].correct = isCorrect;
+            blockResponses[item.id].selectedItems = selectedItems;
+            blockResponses[item.id].correctItems = correctItems;
+        }
+        
+        // Handle "other" text for radio buttons
+        if (item.type === 'radio') {
+            const otherText = formData.get(`${item.id}_other_text`);
+            if (otherText) {
+                blockResponses[item.id].otherText = otherText;
+            }
+        }
+    });
         
         // Store responses
         this.responses[block.id] = {
