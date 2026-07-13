@@ -49,7 +49,7 @@ class ConsentForm {
                 <p>This study takes approximately 15 minutes to complete</p>
                 
                 <h2 style="color: #2c3e50; font-size: 20px; margin-top: 30px;">Payment</h2>
-                <p>You will receive $10 for completing this study. Participants who provide thoughtful responses will receive an additional bonus of $5.</p>
+                <p>You will receive $4 for completing this study. </p>
                 
                 <h2 style="color: #2c3e50; font-size: 20px; margin-top: 30px;">Subjects' Rights</h2>
                 <p>If you have read this form and have decided to participate in this project, please understand your participation is voluntary and you have the right to withdraw your consent or discontinue participation at any time without penalty. You have the right to refuse to answer particular questions. Your individual privacy will be maintained in all published and written data resulting from the study. You may withdraw your data from this study after participation, if you so choose.</p>

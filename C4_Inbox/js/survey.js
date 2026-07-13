@@ -745,7 +745,7 @@ setupDragAndDrop() {
  */
 showThankYou(success, errorMessage = null) {
     // Prolific completion URL - REPLACE WITH YOUR ACTUAL COMPLETION CODE
-    const prolificCompletionURL = 'https://app.prolific.com/submissions/complete?cc=YOUR_COMPLETION_CODE';
+    const prolificCompletionURL = 'https://app.prolific.com/submissions/complete?cc=CK1TWS0V';
     
     if (success) {
         this.container.innerHTML = `
